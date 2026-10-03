@@ -54,3 +54,15 @@ test("without JavaScript there is no toggle", async ({ browser, baseURL }) => {
   await expect(page.locator("[data-theme-toggle]")).toBeHidden();
   await context.close();
 });
+
+test("the toggle sits after the links on desktop and left of Menu on phones", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+  const toggle = page.locator("[data-theme-toggle]");
+  const lastLink = page.getByRole("link", { name: "Verhuur", exact: true });
+  expect((await toggle.boundingBox())!.x).toBeGreaterThan((await lastLink.boundingBox())!.x);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  const menu = page.getByRole("button", { name: "Menu" });
+  expect((await toggle.boundingBox())!.x).toBeLessThan((await menu.boundingBox())!.x);
+});

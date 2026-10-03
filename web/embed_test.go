@@ -6,7 +6,7 @@ import (
 )
 
 func TestStaticContainsRequiredAssets(t *testing.T) {
-	for _, path := range []string{"static/css/site.css", "static/js/youtube.js", "static/img/logo.svg", "static/img/share.jpg"} {
+	for _, path := range []string{"static/css/site.css", "static/js/youtube.js", "static/js/theme.js", "static/img/logo.svg", "static/img/share.jpg"} {
 		if _, err := fs.Stat(Static, path); err != nil {
 			t.Errorf("%s: %v (run `npx tsc` and add the images)", path, err)
 		}

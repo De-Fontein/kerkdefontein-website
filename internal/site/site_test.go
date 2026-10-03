@@ -135,3 +135,15 @@ func TestRender_MultiDayEventsShowTheirDateRange(t *testing.T) {
 		t.Error("a timed event past midnight must show both dates")
 	}
 }
+
+// The theme script must block rendering (no defer/async/module) so a saved theme is applied before first paint.
+func TestRender_ThemeToggleAndBlockingScriptInHead(t *testing.T) {
+	html := render(t, sampleData(), "index.html")
+	head := html[:strings.Index(html, "</head>")]
+	if !strings.Contains(head, `<script src="/static/js/theme.js"></script>`) {
+		t.Error("head must load theme.js as a plain blocking script")
+	}
+	if !strings.Contains(html, `<button type="button" class="theme-toggle" data-theme-toggle hidden`) {
+		t.Error("theme toggle must start hidden, so it never shows without JavaScript")
+	}
+}

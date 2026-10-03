@@ -11,8 +11,9 @@
   --focus: var(--teal);
   --radius: 1rem; --space: clamp(1rem, 4vw, 2rem); --max: 72rem;
 }
+/* Dark tokens appear twice: CSS cannot share one block between a media query and an attribute selector. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #0f0f10; --text: var(--cream); --muted: var(--sand); --accent: var(--cream); --on-accent: var(--navy);
     --line: #2a2a2e; --surface: #18181b;
     --hero: radial-gradient(ellipse at 80% 20%, var(--teal) 0%, var(--navy) 50%, #0f0f10 100%);
@@ -20,6 +21,15 @@
     --focus: var(--sky);
   }
 }
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0f0f10; --text: var(--cream); --muted: var(--sand); --accent: var(--cream); --on-accent: var(--navy);
+  --line: #2a2a2e; --surface: #18181b;
+  --hero: radial-gradient(ellipse at 80% 20%, var(--teal) 0%, var(--navy) 50%, #0f0f10 100%);
+  --hero-text: var(--cream); --hero-meta: var(--sand);
+  --focus: var(--sky);
+}
+:root[data-theme="light"] { color-scheme: light; }
 
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -35,11 +45,13 @@ h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0 0 1rem; }
 
 .site-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; max-width: var(--max); margin: 0 auto; padding: 1rem var(--space); }
 .brand { display: flex; align-items: center; gap: .5rem; font-weight: 700; color: var(--text); text-decoration: none; }
-.menu-toggle { font: inherit; font-weight: 600; color: var(--text); background: none; border: 2px solid currentColor; border-radius: 99px; padding: .4rem 1rem; }
+.menu-toggle, .theme-toggle { font: inherit; font-weight: 600; color: var(--text); background: none; border: 2px solid currentColor; border-radius: 99px; padding: .4rem 1rem; }
 .menu { list-style: none; margin: 0; padding: 1.5rem; border: 0; border-radius: var(--radius); background: var(--bg); color: var(--text); box-shadow: 0 1rem 3rem rgb(0 0 0 / .25); inset: 4.5rem 1rem auto auto; }
 .menu li + li { margin-top: .75rem; }
 .menu a { color: var(--text); font-weight: 600; text-decoration: none; }
 .menu a:hover, .menu a[aria-current="page"] { text-decoration: underline; }
+.theme-toggle { width: 2.75rem; height: 2.75rem; padding: 0; font-size: 1.25rem; line-height: 1; cursor: pointer; }
+.theme-toggle[hidden] { display: none; }
 @media (min-width: 60rem) {
   .menu-toggle { display: none; }
   .menu[popover] { display: flex; position: static; inset: auto; gap: 1.5rem; align-items: center; padding: 0; overflow: visible; background: none; box-shadow: none; }

@@ -13,7 +13,7 @@ test("a page load makes no third-party requests and no CSP violations", async ({
   expect(cspErrors).toEqual([]);
 });
 
-test("the large flyer loads only when its popover opens", async ({ page }) => {
+test("large flyers load only once one opens, together with its two neighbours", async ({ page }) => {
   const large: string[] = [];
   page.on("request", (r) => { if (r.url().includes("-1600.webp")) large.push(r.url()); });
   await page.goto("/");
@@ -21,8 +21,8 @@ test("the large flyer loads only when its popover opens", async ({ page }) => {
   expect(large).toEqual([]);
   await page.getByRole("button", { name: /^Vergroot:/ }).first().click();
   await expect(page.locator(".flyer-popover:popover-open img")).toBeVisible();
-  // Chromium starts the lazy load a moment after the popover becomes visible.
-  await expect.poll(() => large.length).toBe(1);
+  // Chromium starts the lazy load a moment after the popover becomes visible. 3 = the open flyer + neighbours.
+  await expect.poll(() => new Set(large).size).toBe(3);
 });
 
 test("a flyer with a link shows Meer info inside the popover", async ({ page }) => {
@@ -248,4 +248,62 @@ test("text pages line up in the same centred column", async ({ page }) => {
   }
   const reference = columns["/over-ons/"];
   expect(Object.entries(columns).filter(([, x]) => x !== reference)).toEqual([]);
+});
+
+test("arrow keys move through the enlarged flyers and keep focus in the open one", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Vergroot: Aanbiddingsavond vr 19.30" }).click();
+  const open = page.locator(".flyer-popover:popover-open");
+  await expect(open.locator(".flyer-count")).toHaveText("1 van 3");
+  await page.keyboard.press("ArrowRight");
+  await expect(open.locator(".flyer-count")).toHaveText("2 van 3");
+  await expect(open).toHaveCount(1);
+  expect(await page.evaluate(() => document.activeElement?.closest(".flyer-popover")?.matches(":popover-open"))).toBe(true);
+  await page.keyboard.press("ArrowLeft");
+  await page.keyboard.press("ArrowLeft"); // wraps from the first to the last
+  await expect(open.locator(".flyer-count")).toHaveText("3 van 3");
+});
+
+test("Volgende works without JavaScript", async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false, baseURL });
+  const page = await context.newPage();
+  await page.goto("/");
+  await page.getByRole("button", { name: "Vergroot: Aanbiddingsavond vr 19.30" }).click();
+  await page.locator(".flyer-popover:popover-open").getByRole("button", { name: "Volgende flyer" }).click();
+  // Natively the next flyer opens on top of the current one; the top one is the last in the top layer.
+  await expect(page.locator(".flyer-popover:popover-open .flyer-count").last()).toHaveText("2 van 3");
+  await context.close();
+});
+
+test("swiping left on an enlarged flyer shows the next one", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Vergroot: Aanbiddingsavond vr 19.30" }).click();
+  const open = page.locator(".flyer-popover:popover-open");
+  await open.evaluate((el) => {
+    const swipe = (type: string, x: number) =>
+      el.dispatchEvent(new PointerEvent(type, { pointerType: "touch", clientX: x, clientY: 300, bubbles: true }));
+    swipe("pointerdown", 300);
+    swipe("pointerup", 120);
+  });
+  await expect(open.locator(".flyer-count")).toHaveText("2 van 3");
+});
+
+// Seen by the user (2026-10-03): the enlarged flyer grew when its image loaded, moving the buttons. The popup's
+// size may depend on the screen only, never on the image, so stepping through flyers keeps the buttons still.
+test("the gallery buttons stay put while images load and between flyers", async ({ page }) => {
+  await page.route(/-1600\.webp$/, async (route) => {
+    await new Promise((r) => setTimeout(r, 800));
+    await route.continue();
+  });
+  for (const [width, height] of [[390, 844], [1280, 800]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto("/");
+    await page.getByRole("button", { name: "Vergroot: Aanbiddingsavond vr 19.30" }).click();
+    const next = () => page.locator(".flyer-popover:popover-open [data-flyer-next]").boundingBox();
+    const first = await next();
+    await expect(page.locator(".flyer-popover:popover-open img")).toHaveJSProperty("complete", true);
+    expect(await next(), `moved while the image loaded at ${width}px`).toEqual(first);
+    await page.keyboard.press("ArrowRight");
+    expect(await next(), `moved to the next flyer at ${width}px`).toEqual(first);
+  }
 });

@@ -28,7 +28,8 @@
 {{template "header" .}}
 <main id="main">{{template "main" .}}</main>
 {{template "footer" .}}
-{{if eq .Page.Path "/"}}<script type="module" src="{{asset "js/youtube.js"}}"></script>{{end}}
+{{if eq .Page.Path "/"}}<script type="module" src="{{asset "js/youtube.js"}}"></script>
+<script type="module" src="{{asset "js/flyers.js"}}"></script>{{end}}
 {{if eq .Page.Path "/activiteiten/"}}<script type="module" src="{{asset "js/activiteiten.js"}}"></script>{{end}}
 {{if eq .Page.Path "/doneren/"}}<script type="module" src="{{asset "js/giving.js"}}"></script>{{end}}
 </body>

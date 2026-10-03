@@ -269,3 +269,19 @@ func TestRun_ConvertsAgainWhenTheCacheIsFromAnOlderVersion(t *testing.T) {
 		t.Error("flyers must be converted again instead of reusing an older cache entry")
 	}
 }
+
+// Two builds from the same uncommitted code share a version ("abc123-dirty"); a template change must still
+// republish, or `make deploy` silently keeps the old site (found 2026-10-03).
+func TestRun_ChangedTemplatesRepublishUnderTheSameVersion(t *testing.T) {
+	src, s := setup(t, nil)
+	if _, err := Run(context.Background(), quiet, src, s, now); err != nil {
+		t.Fatal(err)
+	}
+	original := embeddedContent
+	t.Cleanup(func() { embeddedContent = original })
+	embeddedContent = func() string { return "templates edited" }
+	out, err := Run(context.Background(), quiet, src, s, now.Add(time.Minute))
+	if err != nil || !out.Published {
+		t.Fatalf("changed templates must republish: published=%v err=%v", out.Published, err)
+	}
+}

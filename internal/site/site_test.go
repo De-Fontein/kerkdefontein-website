@@ -216,3 +216,27 @@ func TestRender_VideoThumbnailHasHighPriorityAndImagesAreVersioned(t *testing.T)
 		t.Errorf("logo and favicon must use the versioned URL, found %d", n)
 	}
 }
+
+// The enlarged flyers form a gallery (user, 2026-10-03): Vorige/Volgende open the neighbouring popover natively,
+// wrapping around, so it works without JavaScript; a script adds arrow keys and swipes.
+func TestRender_EnlargedFlyersLinkToTheirNeighbours(t *testing.T) {
+	d := sampleData()
+	d.Flyers = append(d.Flyers, FlyerView{ID: "f3", Alt: "Kamp"})
+	html := render(t, d, "index.html")
+	for _, want := range []string{
+		`popovertarget="flyer-f3" aria-label="Vorige flyer"`, // f1 wraps back to the last
+		`popovertarget="flyer-f2" aria-label="Volgende flyer"`,
+		`<span class="flyer-count">1 van 3</span>`,
+		`<span class="flyer-count">3 van 3</span>`,
+		"js/flyers.js",
+	} {
+		if !strings.Contains(html, want) {
+			t.Errorf("home misses %s", want)
+		}
+	}
+	single := sampleData()
+	single.Flyers = single.Flyers[:1]
+	if strings.Contains(render(t, single, "index.html"), "Volgende flyer") {
+		t.Error("a single flyer needs no gallery navigation")
+	}
+}

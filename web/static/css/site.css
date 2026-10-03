@@ -128,8 +128,20 @@ h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0 0 1rem; }
 .flyers { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; grid-template-columns: repeat(2, 1fr); }
 @media (min-width: 48rem) { .flyers { grid-template-columns: repeat(3, 1fr); } }
 .flyer-open { display: block; width: 100%; padding: 0; border: 0; border-radius: .75rem; overflow: hidden; background: none; cursor: zoom-in; }
-.flyer-popover { border: 0; padding: 1rem; border-radius: var(--radius); background: var(--bg); color: var(--text); max-width: min(92vw, 50rem); max-height: 92vh; overflow: auto; }
+/* A fixed A4-portrait frame computed from the screen alone: the buttons sit still while an image loads and when
+   stepping to a flyer of another shape (svh, not dvh, so appearing browser toolbars do not resize it either).
+   10.5rem leaves room for the two button rows; other shapes are letterboxed inside the frame. */
+.flyer-popover { border: 0; padding: 1rem; border-radius: var(--radius); background: var(--bg); color: var(--text); width: min(92vw, 50rem, calc((92svh - 10.5rem) / 1.4142 + 2rem)); max-height: 92svh; overflow: auto; }
 .flyer-popover::backdrop { background: rgb(0 0 0 / .7); }
+/* Fixed slots: the counter stays centred and the buttons keep their place as the count changes width. */
+.flyer-nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: .75rem; margin: 1rem 0 0; }
+.flyer-nav [data-flyer-prev] { justify-self: start; }
+.flyer-nav [data-flyer-next] { justify-self: end; }
+.flyer-step { display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; padding: 0; border: 2px solid var(--accent); border-radius: 99px; background: none; color: var(--accent); cursor: pointer; }
+.flyer-step:hover { background: var(--surface); }
+.flyer-popover picture { display: block; }
+.flyer-popover img { width: 100%; aspect-ratio: 1 / 1.4142; object-fit: contain; }
+.flyer-count { color: var(--muted); font-weight: 600; font-variant-numeric: tabular-nums; }
 .flyer-actions { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: flex-end; margin: 1rem 0 0; }
 
 .events { list-style: none; margin: 0; padding: 0; }

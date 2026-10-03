@@ -18,6 +18,7 @@ import (
 	"github.com/De-Fontein/kerkdefontein-website/internal/content"
 	"github.com/De-Fontein/kerkdefontein-website/internal/drive"
 	"github.com/De-Fontein/kerkdefontein-website/internal/release"
+	"github.com/De-Fontein/kerkdefontein-website/internal/site"
 	"github.com/De-Fontein/kerkdefontein-website/internal/youtube"
 )
 
@@ -26,6 +27,10 @@ const (
 	maxEvents      = 50
 	fingerprintTxt = "fingerprint"
 )
+
+// embeddedContent covers what the version string misses: two builds from the same uncommitted code share a
+// version, and a template edit must still republish. A variable so a test can simulate an edit.
+var embeddedContent = site.ContentHash
 
 type Sources struct {
 	Drive       drive.Client
@@ -58,7 +63,7 @@ func Run(ctx context.Context, log *slog.Logger, src Sources, s Settings, now tim
 		log.Error("source failed, keeping current release", "err", err)
 		return Outcome{}, err
 	}
-	fp := Fingerprint(s.Version, in.flyers, in.docs, in.events, in.video)
+	fp := Fingerprint(s.Version+"+"+embeddedContent(), in.flyers, in.docs, in.events, in.video)
 	if previous, err := os.ReadFile(filepath.Join(s.SiteRoot, fingerprintTxt)); err == nil && string(previous) == fp {
 		log.Info("no change", "fingerprint", fp[:12])
 		return Outcome{}, nil

@@ -3,20 +3,29 @@ package site
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"embed"
+	"encoding/hex"
 	"fmt"
 	"html/template"
+	"io/fs"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
+	"sync"
 
 	"github.com/De-Fontein/kerkdefontein-website/internal/calendar"
 	"github.com/De-Fontein/kerkdefontein-website/internal/images"
+	"github.com/De-Fontein/kerkdefontein-website/web"
 )
 
 type FlyerView struct {
 	ID, Alt, Link         string
 	Thumb, Thumb2x, Large images.Variant
+	// Place in the enlarged-flyer gallery, set by Render.
+	Position, Total int
+	PrevID, NextID  string
 }
 
 type VideoView struct {
@@ -86,6 +95,7 @@ type view struct {
 }
 
 func Render(outDir string, d Data) error {
+	d.Flyers = numbered(d.Flyers)
 	for _, p := range Pages {
 		if err := renderPage(outDir, p, d); err != nil {
 			return fmt.Errorf("render %s: %w", p.Path, err)
@@ -125,3 +135,34 @@ func outputPath(outDir, pagePath string) string {
 	}
 	return filepath.Join(outDir, filepath.FromSlash(strings.Trim(pagePath, "/")), "index.html")
 }
+
+// numbered gives each flyer its place in the gallery and its neighbours, wrapping around at both ends.
+func numbered(flyers []FlyerView) []FlyerView {
+	out := slices.Clone(flyers)
+	for i := range out {
+		out[i].Position, out[i].Total = i+1, len(out)
+		out[i].PrevID = out[(i+len(out)-1)%len(out)].ID
+		out[i].NextID = out[(i+1)%len(out)].ID
+	}
+	return out
+}
+
+// ContentHash identifies the templates and embedded assets this binary renders with.
+var ContentHash = sync.OnceValue(func() string {
+	h := sha256.New()
+	for _, fsys := range []fs.FS{templateFS, web.Static} {
+		err := fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
+			if err != nil || d.IsDir() {
+				return err
+			}
+			b, err := fs.ReadFile(fsys, path)
+			h.Write([]byte(path))
+			h.Write(b)
+			return err
+		})
+		if err != nil {
+			panic(err) // embedded files are always readable
+		}
+	}
+	return hex.EncodeToString(h.Sum(nil))[:12]
+})

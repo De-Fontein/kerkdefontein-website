@@ -1,6 +1,6 @@
 {{define "events"}}{{if .}}<ul class="events">{{range .}}
   <li class="event">
-    <time datetime="{{isoDate .Start}}">{{dutchDate .Start}}</time>
+    <time datetime="{{isoDate .Start}}">{{dateRange .Event}}</time>
     <span class="event-title">{{.Summary}}</span>
     <span class="event-meta">{{if not .AllDay}}{{clock .Start}}{{else}}Hele dag{{end}}{{with .Location}} · {{.}}{{end}}</span>
     <a class="event-ics" href="{{.ICSHref}}" download>Zet in mijn agenda<span class="visually-hidden">: {{.Summary}}</span></a>

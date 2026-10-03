@@ -114,3 +114,24 @@ func TestRender_VideoButtonNameStartsWithAfspelen(t *testing.T) {
 		t.Error("play icon must be aria-hidden, followed by the Afspelen label")
 	}
 }
+
+func TestRender_MultiDayEventsShowTheirDateRange(t *testing.T) {
+	d := Data{BaseURL: "https://kerkdefontein.nl", Events: []EventView{
+		{Event: calendar.Event{ID: "kamp", Summary: "Gemeentekamp", AllDay: true,
+			Start: time.Date(2026, 10, 24, 0, 0, 0, 0, calendar.Amsterdam), End: time.Date(2026, 10, 27, 0, 0, 0, 0, calendar.Amsterdam)}},
+		{Event: calendar.Event{ID: "dag", Summary: "Startzondag", AllDay: true,
+			Start: time.Date(2026, 11, 1, 0, 0, 0, 0, calendar.Amsterdam), End: time.Date(2026, 11, 2, 0, 0, 0, 0, calendar.Amsterdam)}},
+		{Event: calendar.Event{ID: "nacht", Summary: "Gebedsnacht",
+			Start: time.Date(2026, 11, 6, 22, 0, 0, 0, calendar.Amsterdam), End: time.Date(2026, 11, 7, 6, 0, 0, 0, calendar.Amsterdam)}},
+	}}
+	html := render(t, d, "agenda/index.html")
+	if !strings.Contains(html, "za 24 okt – ma 26 okt") {
+		t.Error("multi-day all-day event must show its last day (Google's end date is exclusive)")
+	}
+	if !strings.Contains(html, ">zo 1 nov<") {
+		t.Error("single-day all-day event must show one date")
+	}
+	if !strings.Contains(html, "vr 6 nov – za 7 nov") {
+		t.Error("a timed event past midnight must show both dates")
+	}
+}

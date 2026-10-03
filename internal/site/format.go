@@ -14,16 +14,34 @@ var (
 )
 
 var funcs = map[string]any{
-	"dutchDate": func(t time.Time) string {
-		t = t.In(calendar.Amsterdam)
-		return fmt.Sprintf("%s %d %s", weekdays[t.Weekday()], t.Day(), months[t.Month()-1])
-	},
-	"clock":   func(t time.Time) string { return t.In(calendar.Amsterdam).Format("15:04") },
-	"isoDate": func(t time.Time) string { return t.In(calendar.Amsterdam).Format("2006-01-02") },
+	"dutchDate": dutchDate,
+	"dateRange": dateRange,
+	"clock":     func(t time.Time) string { return t.In(calendar.Amsterdam).Format("15:04") },
+	"isoDate":   isoDate,
 	"limit": func(n int, events []EventView) []EventView {
 		if len(events) > n {
 			return events[:n]
 		}
 		return events
 	},
+}
+
+func dutchDate(t time.Time) string {
+	t = t.In(calendar.Amsterdam)
+	return fmt.Sprintf("%s %d %s", weekdays[t.Weekday()], t.Day(), months[t.Month()-1])
+}
+
+func isoDate(t time.Time) string { return t.In(calendar.Amsterdam).Format("2006-01-02") }
+
+// dateRange shows the last day too when an event spans several days. Google's end is exclusive (the next
+// day for all-day events, the end instant for timed ones), so step back before taking its date.
+func dateRange(e calendar.Event) string {
+	last := e.End.Add(-time.Nanosecond)
+	if e.AllDay {
+		last = e.End.AddDate(0, 0, -1)
+	}
+	if isoDate(last) <= isoDate(e.Start) {
+		return dutchDate(e.Start)
+	}
+	return dutchDate(e.Start) + " – " + dutchDate(last)
 }

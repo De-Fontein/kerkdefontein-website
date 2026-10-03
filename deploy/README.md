@@ -42,8 +42,8 @@ serves `/srv/site/current`. Secrets live only on the server, never in this repos
    ```
 
    Write `/etc/fontein/config.json` from `config.example.json`, with mode `640` and owner `root:fontein`.
-5. **healthchecks.io.** Create a check `kerkdefontein-build`: period 1 minute, grace 15 minutes, an email
-   integration to the webmaster. Put its ping URL in the config.
+5. **Alerts (optional).** None are used (decision 2026-10-03), so leave `healthcheckUrl` empty. To get an email
+   when builds stop: create a healthchecks.io check (period 1 minute, grace 15 minutes) and put its ping URL there.
 6. **Units and Caddy**:
 
    ```bash

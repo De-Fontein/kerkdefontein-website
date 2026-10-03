@@ -31,7 +31,13 @@ The site and email move separately. Moving the domain and the 50 mailboxes (abou
 - The **file name is the screen-reader text**. The extension is dropped, and dots inside the name such as "19.30" are kept.
 - If the Drive **description** is an absolute `https://` URL, the enlarged flyer shows a "Meer info" button. Any
   other description is ignored and logged.
-- A click opens the enlarged flyer in a native `popover`.
+- Thumbnails come in 360 and 720 px; the browser picks one (`srcset`/`sizes`).
+- A click opens the **enlarged view**, a native `popover` that covers the screen:
+  - The whole flyer fits the screen: controls beside it on wide screens, above and below it on portrait screens.
+  - ‹ / › buttons, arrow keys and swipes step through the flyers, wrapping around, with a counter ("2 van 4").
+  - A click on the flyer zooms to a wide, scrollable view. Without JS it is a link to the image file.
+  - Focus starts inside, Tab stays inside, and closing returns focus to the thumbnail of the flyer last shown.
+  - Sizes come from the screen only, never from the image, so nothing moves while images load or between flyers.
 - A new or changed flyer is live within **5 minutes**. The build runs every minute.
 
 ### Video
@@ -51,7 +57,8 @@ The site and email move separately. Moving the domain and the 50 mailboxes (abou
 | Third parties | **Zero requests on page load.** YouTube and Scipio load only after a click. No cookie banner |
 | Tracking | No analytics, no visitor statistics, no access logs |
 | Freshness | A change in Drive, Calendar or YouTube is visible within 5 minutes |
-| Browsers | Last 2 versions of Chrome, Safari (including iOS), Firefox and Edge |
+| Browsers | Last 2 versions of Chrome, Safari (including iOS), Firefox and Edge; usable from 250 px wide (small phones, zoomed-in Safari) |
+| Reader View | Safari's Reader View shows each page's full text |
 
 ## Technology
 
@@ -71,7 +78,7 @@ The site and email move separately. Moving the domain and the 50 mailboxes (abou
 | Path | Content |
 |---|---|
 | `/` | Hero, latest service video, flyers ("Actueel"), next 3 agenda items, giving teaser |
-| `/eerste-keer/` | First visit. **Placeholder (lorem ipsum) until the church supplies the text** |
+| `/eerste-keer/` | First visit; "Route plannen" opens the visitor's own maps app. **Placeholder (lorem ipsum) until the church supplies the text** |
 | `/samenkomsten/` | Sunday services, Avondmaal, Dopen, Opdragen |
 | `/activiteiten/` | Grouped list beside one flat article; facts (Wanneer / Voor wie / Contact) per activity. Anchors such as `#vrouwen` are linked from flyers. Vrouwen is a **placeholder** |
 | `/agenda/` | All upcoming events, an `.ics` download per event, a subscribe link, the nieuwsflits archive |
@@ -126,6 +133,10 @@ The site and email move separately. Moving the domain and the 50 mailboxes (abou
 | 2026-10-03 | Enlarged flyers: ‹ / › buttons, arrow keys and swipes; no auto-rotating carousel (missed content, WCAG 2.2.2) |
 | 2026-10-03 | Route plannen opens the visitor's own maps app (Apple Maps, Android's choice), OpenStreetMap otherwise |
 | 2026-10-03 | Keep render-blocking CSS and theme script: inlining costs CSP hashes per deploy; LCP is ~0.5 s on slow 4G |
+| 2026-10-04 | Enlarged flyer fits the screen with its controls around it, plus click-to-zoom (filling the width needed scrolling) |
+| 2026-10-04 | The enlarged view keeps keyboard focus inside and returns it on close (WCAG 2.2 Focus Not Obscured) |
+| 2026-10-04 | Below 360 px the header shows only the logo; the video title sits below its thumbnail |
+| 2026-10-04 | Text pages, Agenda and Activiteiten share one centred reading column; Activiteiten's list sits in the margin |
 
 ## Open items
 

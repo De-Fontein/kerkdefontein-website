@@ -25,6 +25,8 @@ Run `make test` and `make e2e` before every commit. Both must pass.
 - `internal/site`: `Pages`, `Nav`, templates (`templates/pages/*.html`, `partials/`), JSON-LD, Dutch date helpers.
 - `internal/{drive,calendar,youtube}` are thin REST clients; `internal/content` holds the flyer and document rules.
 - `web/static` holds the CSS, images and PDFs, embedded in the binary. `web/ts` compiles to the gitignored `web/static/js`.
+- Scripts, each loaded only where needed (`templates/layout.html`): `theme` on every page (blocking, in `<head>`),
+  `youtube` and `flyers` on the home page, `activiteiten`, `giving` (Doneren) and `route` (Eerste keer).
 - `deploy/` holds the Caddyfile, the systemd units and a runbook. `internal/headers.CSP` must equal the Caddyfile
   CSP; a test enforces it.
 
@@ -34,6 +36,12 @@ Run `make test` and `make e2e` before every commit. Both must pass.
   `width`/`height`. Give header and hero items fixed slots. Don't centre or right-align groups whose width depends
   on content that arrives later. Don't show or hide things after load. `behaviour.spec.ts` cuts every page off at
   every node; keep it green.
+- **Native first.** Every feature works with plain HTML (`popover`, links, anchors); scripts only enhance it. Test
+  each feature with JavaScript off too.
+- **Reader View.** Keep a page's text in one flat block (one `<article>`, headings inside). Safari's Reader View
+  shows only one of several sibling blocks.
+- **Overlays that cover the page** move focus inside when they open, keep Tab inside, and return focus on close
+  (WCAG 2.2 Focus Not Obscured). The axe scan does not test this; `behaviour.spec.ts` does for the flyer view.
 - **No third-party requests on page load.** Embeds (YouTube, Scipio) load on click, with a plain-link fallback
   when JS is off. Every new embed origin needs `frame-src` in both CSP copies and a line on `/privacy/`.
 - **No personal details** in pages, code, docs or commit messages: the repository is public, and git history
@@ -59,3 +67,9 @@ Run `make test` and `make e2e` before every commit. Both must pass.
 - The Playwright `webServer` runs the preview with fake data. Tests that touch YouTube or Scipio must stub them
   with `page.route`.
 - `layout-shift` entries exist only in Chromium. The cut-off test in `behaviour.spec.ts` is the cross-browser check.
+- A button inside an open popover that targets another popover opens it **on top**, keeping the first open.
+  `flyers.ts` closes the first one itself.
+- The popover `toggle` event fires asynchronously and doesn't bubble: listen in the capture phase, and in tests use
+  `expect.poll` for anything it does (such as moving focus).
+- The files in `web/ts` have no imports or exports, so `tsc` puts them in one global scope: top-level names must
+  be unique across files.

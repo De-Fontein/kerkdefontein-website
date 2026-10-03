@@ -1,0 +1,12 @@
+{{define "flyer"}}<li class="flyer">
+  <button type="button" class="flyer-open" popovertarget="flyer-{{.ID}}" aria-label="Vergroot: {{.Alt}}">
+    <picture><img src="/media/{{.Thumb.File}}" alt="" width="{{.Thumb.Width}}" height="{{.Thumb.Height}}" loading="lazy" decoding="async"></picture>
+  </button>
+  <div id="flyer-{{.ID}}" class="flyer-popover" popover>
+    <picture><img src="/media/{{.Large.File}}" alt="{{.Alt}}" width="{{.Large.Width}}" height="{{.Large.Height}}" loading="lazy" decoding="async"></picture>
+    <p class="flyer-actions">
+      {{if .Link}}<a class="button" href="{{.Link}}">Meer info</a>{{end}}
+      <button type="button" class="button button-outline" popovertarget="flyer-{{.ID}}" popovertargetaction="hide">Sluiten</button>
+    </p>
+  </div>
+</li>{{end}}

@@ -182,10 +182,13 @@ h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0 0 1rem; }
 .act-article h2 { margin: 0 0 1rem; scroll-margin-top: 4.5rem; }
 .act-facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: .75rem 1.5rem; margin: 0 0 1.5rem; padding: 1rem 1.25rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
 .act-facts dd { margin: .15rem 0 0; font-weight: 600; }
-@media (min-width: 60rem) {
-  .act-page { display: grid; grid-template-columns: 15rem 1fr; column-gap: 4rem; align-items: start; }
-  .act-page h1 { grid-column: 1 / -1; }
-  .act-aside { top: 1.5rem; }
+/* Heading and text sit in the same centred column as every text page; the list goes in the margin beside it
+   once the margin is wide enough (78rem), and until then the phone's "Ga naar" bar is used. */
+.act-page { max-width: 65ch; }
+@media (min-width: 78rem) {
+  .act-page { max-width: none; display: grid; grid-template-columns: 1fr minmax(0, 65ch) 1fr; align-items: start; }
+  .act-page > h1, .act-article { grid-column: 2; margin-inline: var(--space); }
+  .act-aside { grid-column: 1; grid-row: 2; justify-self: end; width: 15rem; margin-right: 1rem; top: 1.5rem; }
   .act-bar, .act-jump-list { display: none; }
   .act-column { display: block; }
   .act-article h2 { scroll-margin-top: 1.5rem; }

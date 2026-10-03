@@ -192,8 +192,8 @@ test("Activiteiten highlights the activity being read in the list", async ({ pag
     await page.setViewportSize({ width, height: 800 });
     await page.goto("/activiteiten/");
     await page.evaluate(() => document.getElementById("kringen")!.scrollIntoView({ behavior: "instant" }));
-    await expect(page.locator(".act-nav a[aria-current]").filter({ visible: true })).toHaveText(width < 960 ? [] : ["Kringen"]);
-    if (width < 960) await expect(page.locator("[data-current]")).toHaveText("Kringen");
+    await expect(page.locator(".act-nav a[aria-current]").filter({ visible: true })).toHaveText(width < 1248 ? [] : ["Kringen"]);
+    if (width < 1248) await expect(page.locator("[data-current]")).toHaveText("Kringen");
   }
 });
 
@@ -237,12 +237,12 @@ test("the header and video fit at every width from 250 px", async ({ page }) => 
   }
 });
 
-// Text pages share one centred reading column (user, 2026-10-03: Agenda sat to the left of the others).
-// Home and Activiteiten have their own wide layouts.
+// Text pages share one centred reading column (user, 2026-10-03: Agenda, then Activiteiten, sat to the left of
+// the others). Activiteiten keeps its list in the margin beside that column. Home has its own wide layout.
 test("text pages line up in the same centred column", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   const columns: Record<string, number> = {};
-  for (const path of allPages.filter((p) => p !== "/" && p !== "/activiteiten/")) {
+  for (const path of allPages.filter((p) => p !== "/")) {
     await page.goto(path);
     columns[path] = Math.round((await page.locator("main h1").boundingBox())!.x);
   }

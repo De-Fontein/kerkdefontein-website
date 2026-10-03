@@ -19,6 +19,7 @@ type Fixtures struct {
 	FeedXML           string
 	Thumbs            map[string][]byte // YouTube video ID → hqdefault.jpg
 	FailCalendar      bool
+	OnDownload        func() // test hook, called before a Drive file is served
 }
 
 func (f Fixtures) Handler() http.Handler {
@@ -35,6 +36,9 @@ func (f Fixtures) Handler() http.Handler {
 		json.NewEncoder(w).Encode(map[string]any{"files": files})
 	})
 	mux.HandleFunc("GET /drive/v3/files/{id}", func(w http.ResponseWriter, r *http.Request) {
+		if f.OnDownload != nil {
+			f.OnDownload()
+		}
 		body, ok := f.Files[r.PathValue("id")]
 		if !ok {
 			http.NotFound(w, r)

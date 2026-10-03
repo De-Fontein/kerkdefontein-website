@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -36,7 +37,7 @@ type Sources struct {
 
 type Settings struct {
 	FlyerFolderID, DocumentsFolderID, CalendarID, CalendarICalURL, YouTubeChannelID string
-	SiteRoot, CacheDir, BaseURL, Version                                          string
+	SiteRoot, CacheDir, BaseURL, Version                                            string
 }
 
 type Outcome struct {
@@ -69,7 +70,14 @@ func Run(ctx context.Context, log *slog.Logger, src Sources, s Settings, now tim
 	}
 	docs, docProblems := content.SelectDocuments(in.docs)
 	m := media{src: src, cacheDir: s.CacheDir, log: log}
-	prepared, mediaProblems := m.prepare(ctx, flyers.Shown, docs, in.video)
+	prepared, mediaProblems, err := m.prepare(ctx, flyers.Shown, docs, in.video)
+	if err == nil {
+		err = ctx.Err() // a conversion killed by the deadline looks like a broken file; it is not
+	}
+	if err != nil {
+		log.Error("source failed, keeping current release", "err", err)
+		return Outcome{}, err
+	}
 	problems := append(append(flyers.Skipped, docProblems...), mediaProblems...)
 	for _, p := range problems {
 		log.Warn("file skipped", "file", p.Name, "reason", p.Reason)
@@ -83,8 +91,8 @@ func Run(ctx context.Context, log *slog.Logger, src Sources, s Settings, now tim
 		log.Error("publish failed, keeping current release", "err", err)
 		return Outcome{}, err
 	}
-	if err := os.WriteFile(filepath.Join(s.SiteRoot, fingerprintTxt), []byte(fp), 0o644); err != nil {
-		return Outcome{}, fmt.Errorf("write fingerprint: %w", err)
+	if err := recordFingerprint(s.SiteRoot, fp, problems); err != nil {
+		return Outcome{}, err
 	}
 	log.Info("published", "release", name, "flyers", len(prepared.flyers), "events", len(in.events), "documents", len(prepared.docs))
 	return Outcome{Published: true, Release: dir, Problems: problems}, nil
@@ -106,6 +114,22 @@ func gather(ctx context.Context, src Sources, s Settings, now time.Time) (inputs
 		return inputs{}, fmt.Errorf("video: %w", err)
 	}
 	return in, nil
+}
+
+// recordFingerprint skips the record while files are skipped, so every run retries them and keeps the
+// healthcheck alert open until a volunteer fixes the file.
+func recordFingerprint(siteRoot, fp string, problems []content.Problem) error {
+	path := filepath.Join(siteRoot, fingerprintTxt)
+	if len(problems) > 0 {
+		if err := os.Remove(path); err != nil && !errors.Is(err, os.ErrNotExist) {
+			return fmt.Errorf("clear fingerprint: %w", err)
+		}
+		return nil
+	}
+	if err := os.WriteFile(path, []byte(fp), 0o644); err != nil {
+		return fmt.Errorf("write fingerprint: %w", err)
+	}
+	return nil
 }
 
 // Fingerprint includes the binary version, so a deploy always triggers a rebuild with the new templates.

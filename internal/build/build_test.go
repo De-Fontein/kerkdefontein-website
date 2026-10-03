@@ -37,17 +37,17 @@ func setup(t *testing.T, mutate func(*fake.Fixtures)) (Sources, Settings) {
 	t.Cleanup(srv.Close)
 	root := t.TempDir()
 	return Sources{
-			Drive:       drive.Client{HTTP: srv.Client(), BaseURL: srv.URL},
-			Calendar:    calendar.Client{HTTP: srv.Client(), BaseURL: srv.URL},
-			Web:         srv.Client(),
-			YouTubeBase: srv.URL,
-			ThumbBase:   srv.URL,
-		}, Settings{
-			FlyerFolderID: fake.SampleFlyerFolder, DocumentsFolderID: fake.SampleDocumentsFolder,
-			CalendarID: "kerk", YouTubeChannelID: fake.SampleChannel,
-			SiteRoot: filepath.Join(root, "site"), CacheDir: filepath.Join(root, "cache"),
-			BaseURL: "https://kerkdefontein.nl", Version: "test",
-		}
+		Drive:       drive.Client{HTTP: srv.Client(), BaseURL: srv.URL},
+		Calendar:    calendar.Client{HTTP: srv.Client(), BaseURL: srv.URL},
+		Web:         srv.Client(),
+		YouTubeBase: srv.URL,
+		ThumbBase:   srv.URL,
+	}, Settings{
+		FlyerFolderID: fake.SampleFlyerFolder, DocumentsFolderID: fake.SampleDocumentsFolder,
+		CalendarID: "kerk", YouTubeChannelID: fake.SampleChannel,
+		SiteRoot: filepath.Join(root, "site"), CacheDir: filepath.Join(root, "cache"),
+		BaseURL: "https://kerkdefontein.nl", Version: "test",
+	}
 }
 
 var quiet = slog.New(slog.NewTextHandler(io.Discard, nil))
@@ -165,5 +165,58 @@ func TestRun_IdenticalFlyersConvertOnceButRenderTwice(t *testing.T) {
 	home, _ := os.ReadFile(filepath.Join(s.SiteRoot, "current", "index.html"))
 	if !strings.Contains(string(home), `id="flyer-flyer1"`) || !strings.Contains(string(home), `id="flyer-flyer2"`) {
 		t.Error("both flyers must render with their own Drive-ID-based HTML ids")
+	}
+}
+
+// A transient Drive error must not publish a site with a flyer missing (spec §8: never a partial build).
+func TestRun_DownloadFailureAbortsAndKeepsCurrent(t *testing.T) {
+	src, s := setup(t, nil)
+	if _, err := Run(context.Background(), quiet, src, s, now); err != nil {
+		t.Fatal(err)
+	}
+	before, _ := os.Readlink(filepath.Join(s.SiteRoot, "current"))
+
+	flaky, _ := setup(t, func(fx *fake.Fixtures) {
+		fx.Flyers[1].MD5 = "new-content" // forces a download, which the fake answers with 404
+		delete(fx.Files, "flyer2")
+	})
+	if _, err := Run(context.Background(), quiet, flaky, s, now.Add(time.Minute)); err == nil {
+		t.Fatal("expected the run to abort on a download failure")
+	}
+	after, _ := os.Readlink(filepath.Join(s.SiteRoot, "current"))
+	if before != after {
+		t.Errorf("current moved from %s to %s after a failed download", before, after)
+	}
+}
+
+// A run that hits its deadline mid-way must abort, not publish whatever it managed to convert.
+func TestRun_CancelledContextDoesNotPublish(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	src, s := setup(t, func(fx *fake.Fixtures) { fx.OnDownload = cancel }) // deadline hits after listing
+	out, err := Run(ctx, quiet, src, s, now)
+	if err == nil || out.Published {
+		t.Fatalf("cancelled run: published=%v err=%v", out.Published, err)
+	}
+	if _, err := os.Stat(filepath.Join(s.SiteRoot, "current")); err == nil {
+		t.Error("a cancelled run must not create a release")
+	}
+}
+
+// A skipped file must keep the alert open: the next run with unchanged sources reports it again.
+func TestRun_SkippedFileIsReportedAgainNextRun(t *testing.T) {
+	src, s := setup(t, func(fx *fake.Fixtures) {
+		fx.Files["flyer2"] = []byte("not a png")
+		fx.Flyers[1].MD5 = "corrupt"
+	})
+	if _, err := Run(context.Background(), quiet, src, s, now); err != nil {
+		t.Fatal(err)
+	}
+	out, err := Run(context.Background(), quiet, src, s, now.Add(time.Minute))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(out.Problems) != 1 {
+		t.Errorf("second run problems = %+v, want the corrupt flyer again", out.Problems)
 	}
 }

@@ -80,7 +80,10 @@ func googleClient(ctx context.Context, keyFile string, base *http.Client) (*http
 	return oauth2.NewClient(context.WithValue(ctx, oauth2.HTTPClient, base), creds.TokenSource), nil
 }
 
+// ping detaches from the run's deadline: a run that timed out is exactly the one that must be reported.
 func ping(ctx context.Context, log *slog.Logger, hc *http.Client, url string, failed bool, message string) {
+	ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 10*time.Second)
+	defer cancel()
 	if err := health.Ping(ctx, hc, url, failed, message); err != nil {
 		log.Error("healthcheck ping failed", "err", err)
 	}

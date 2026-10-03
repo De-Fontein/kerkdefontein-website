@@ -3,6 +3,7 @@ package build
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -37,13 +38,22 @@ type preparedVideo struct {
 	fromDir string
 }
 
+// sourceError marks a failed download: the source is unreachable, not the file broken, so the whole run
+// aborts and retries instead of publishing a site with the file missing (spec §8).
+type sourceError struct{ err error }
+
+func (e sourceError) Error() string { return e.err.Error() }
+func (e sourceError) Unwrap() error { return e.err }
+
 type prepared struct {
 	flyers []preparedFlyer
 	docs   []preparedDoc
 	video  preparedVideo
 }
 
-func (m media) prepare(ctx context.Context, flyers []content.Flyer, docs []content.Document, video youtube.Video) (prepared, []content.Problem) {
+// prepare returns an error only for source failures; a file that downloads but cannot be converted
+// becomes a Problem, so one broken flyer never blocks the others.
+func (m media) prepare(ctx context.Context, flyers []content.Flyer, docs []content.Document, video youtube.Video) (prepared, []content.Problem, error) {
 	var p prepared
 	var problems []content.Problem
 	for _, f := range flyers {
@@ -51,6 +61,9 @@ func (m media) prepare(ctx context.Context, flyers []content.Flyer, docs []conte
 		pair, err := m.converted(dir, func(tmp string) (images.Pair, error) {
 			return m.convertDriveFile(ctx, tmp, f.File.ID, f.File.MimeType, f.File.MD5)
 		})
+		if errors.As(err, new(sourceError)) {
+			return prepared{}, nil, fmt.Errorf("flyer %s: %w", f.File.Name, err)
+		}
 		if err != nil {
 			problems = append(problems, content.Problem{Name: f.File.Name, Reason: err.Error()})
 			continue
@@ -60,13 +73,12 @@ func (m media) prepare(ctx context.Context, flyers []content.Flyer, docs []conte
 	for _, d := range docs {
 		path, err := m.document(ctx, d)
 		if err != nil {
-			problems = append(problems, content.Problem{Name: d.File.Name, Reason: err.Error()})
-			continue
+			return prepared{}, nil, fmt.Errorf("document %s: %w", d.File.Name, err)
 		}
 		p.docs = append(p.docs, preparedDoc{doc: d, path: path})
 	}
 	p.video = m.videoThumb(ctx, video)
-	return p, problems
+	return p, problems, nil
 }
 
 // converted caches by content hash: unchanged flyers are never downloaded or converted again, and a
@@ -109,7 +121,7 @@ func (m media) convertDriveFile(ctx context.Context, tmp, fileID, mimeType, base
 	err = m.src.Drive.Download(ctx, fileID, out)
 	out.Close()
 	if err != nil {
-		return images.Pair{}, err
+		return images.Pair{}, sourceError{err}
 	}
 	pair, err := images.Convert(ctx, src, mimeType, tmp, base)
 	if err != nil {

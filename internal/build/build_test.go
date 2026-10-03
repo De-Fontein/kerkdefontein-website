@@ -220,3 +220,31 @@ func TestRun_SkippedFileIsReportedAgainNextRun(t *testing.T) {
 		t.Errorf("second run problems = %+v, want the corrupt flyer again", out.Problems)
 	}
 }
+
+// Spec: critical HTML+CSS ≤ 14 KB on the wire, so the first round trip can carry a page's first paint.
+func TestRun_EveryPageAndItsCSSFitTheFirstRoundTrip(t *testing.T) {
+	src, s := setup(t, nil)
+	if _, err := Run(context.Background(), quiet, src, s, now); err != nil {
+		t.Fatal(err)
+	}
+	current := filepath.Join(s.SiteRoot, "current")
+	css, err := os.Stat(filepath.Join(current, "static", "css", "site.css.br"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	pages, _ := filepath.Glob(filepath.Join(current, "*.html.br"))
+	nested, _ := filepath.Glob(filepath.Join(current, "*", "*", "index.html.br"))
+	nested1, _ := filepath.Glob(filepath.Join(current, "*", "index.html.br"))
+	for _, page := range append(append(pages, nested1...), nested...) {
+		html, err := os.Stat(page)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if total := html.Size() + css.Size(); total > 14*1024 {
+			t.Errorf("%s + site.css = %d bytes compressed, budget 14 KB", strings.TrimPrefix(page, current), total)
+		}
+	}
+	if len(pages)+len(nested1)+len(nested) < 12 {
+		t.Errorf("found only %d compressed pages", len(pages)+len(nested1)+len(nested))
+	}
+}

@@ -177,3 +177,15 @@ func TestRender_ThemeMenuIsANativePopoverWithFourChoices(t *testing.T) {
 		}
 	}
 }
+
+// Chromium paints a half-arrived page; rel=expect holds the first paint until the header is complete, so header
+// items never move as the rest of it arrives (Firefox and Safari ignore it and rely on the fixed CSS slots).
+func TestRender_FirstPaintWaitsForTheWholeHeader(t *testing.T) {
+	for _, p := range Pages {
+		html := render(t, sampleData(), outputPath("", p.Path))
+		head := html[:strings.Index(html, "</head>")]
+		if !strings.Contains(head, `<link rel="expect" href="#main" blocking="render">`) || !strings.Contains(html, `<main id="main">`) {
+			t.Errorf("%s: first paint does not wait for the header", p.Path)
+		}
+	}
+}

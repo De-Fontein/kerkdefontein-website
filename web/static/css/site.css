@@ -52,9 +52,15 @@ h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0 0 1rem; }
 .skip-link:focus { top: 1rem; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
-.site-header { display: flex; align-items: center; gap: .75rem; max-width: var(--max); margin: 0 auto; padding: 1rem var(--space); }
-/* Pushes the toggle and menu right; the toggle is hidden without JS, so it cannot carry the auto margin. */
-.brand { margin-right: auto; display: flex; align-items: center; gap: .5rem; font-weight: 700; color: var(--text); text-decoration: none; }
+/* Fixed slots: a slow connection paints the header before all of it has arrived, and an item that turns up
+   later must not push one already drawn. Menu's slot is wider than the button needs, in any system font. */
+.site-header { display: grid; grid-template-columns: 1fr minmax(5.5rem, auto); grid-template-areas: "brand nav"; grid-template-rows: 2.75rem; align-items: center; gap: .75rem; max-width: var(--max); margin: 0 auto; padding: 1rem var(--space); }
+:root[data-js] .site-header { grid-template-columns: 1fr 2.75rem minmax(5.5rem, auto); grid-template-areas: "brand toggle nav"; }
+.site-header nav { grid-area: nav; justify-self: end; }
+.theme-toggle { grid-area: toggle; }
+.brand { grid-area: brand; justify-self: start; display: flex; align-items: center; gap: .5rem; font-weight: 700; color: var(--text); text-decoration: none; }
+/* Fixed width: the button keeps its place even if it is drawn before its label has arrived. */
+.menu-toggle { width: 5.5rem; }
 .menu-toggle, .theme-toggle { font: inherit; font-weight: 600; color: var(--text); background: none; border: 2px solid currentColor; border-radius: 99px; padding: .4rem 1rem; }
 .menu { list-style: none; margin: 0; padding: 1.5rem; border: 0; border-radius: var(--radius); background: var(--bg); color: var(--text); box-shadow: 0 1rem 3rem rgb(0 0 0 / .25); inset: 4.5rem 1rem auto auto; }
 .menu li + li { margin-top: .75rem; }
@@ -78,8 +84,9 @@ h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0 0 1rem; }
 .theme-menu input { accent-color: var(--teal); margin: 0; }
 @media (min-width: 60rem) {
   /* On wide screens the toggle sits quietly after the links; on phones it stays a pill next to Menu. */
-  .site-header nav { order: 1; }
-  .theme-toggle { order: 2; border-color: transparent; }
+  .site-header { grid-template-columns: 1fr auto; }
+  :root[data-js] .site-header { grid-template-columns: 1fr auto 2.75rem; grid-template-areas: "brand nav toggle"; }
+  .theme-toggle { border-color: transparent; }
   .theme-toggle:hover { border-color: var(--line); }
   .menu-toggle { display: none; }
   .menu[popover] { display: flex; position: static; inset: auto; gap: 1.5rem; align-items: center; padding: 0; overflow: visible; background: none; box-shadow: none; }
@@ -89,7 +96,13 @@ h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0 0 1rem; }
 .hero { background: var(--hero); color: var(--hero-text); text-align: center; padding: clamp(3rem, 10vw, 7rem) var(--space); }
 .hero h1 { font-size: clamp(2.5rem, 8vw, 5rem); font-weight: 800; margin: 0 auto; max-width: 14ch; }
 .hero-meta { color: var(--hero-meta); font-weight: 600; margin: 1rem 0 2rem; }
-.actions { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: center; margin: 0; }
+/* A slot per button: centring the pair as a group would move the first one when the second arrives. */
+/* Fixed, equal slots: a button never resizes or moves while its label or its neighbour is still arriving.
+   12rem fits "Kijk de dienst" in every system font; stacked on screens too narrow for two. */
+.actions { display: grid; grid-template-columns: min(100%, 12rem); justify-content: center; gap: .75rem; margin: 0; }
+.actions .button { text-align: center; }
+@media (min-width: 28rem) { .actions { grid-template-columns: repeat(2, 12rem); } }
+
 .button { display: inline-block; font: inherit; font-weight: 700; padding: .75rem 1.5rem; border-radius: 99px; border: 2px solid var(--accent); background: var(--accent); color: var(--on-accent); text-decoration: none; cursor: pointer; }
 .button-outline { background: transparent; color: var(--accent); }
 
@@ -103,7 +116,8 @@ h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0 0 1rem; }
 .video { aspect-ratio: 16 / 9; border-radius: var(--radius); background: #000; }
 .video-facade { position: relative; width: 100%; height: 100%; padding: 0; border: 0; border-radius: var(--radius); overflow: hidden; background: #000; color: #fff; font: inherit; cursor: pointer; }
 .video-facade img { width: 100%; height: 100%; object-fit: cover; }
-.video-play { position: absolute; inset: auto 1rem 1rem 1rem; padding: .75rem 1rem; border-radius: .75rem; background: rgb(0 0 0 / .75); text-align: left; font-weight: 700; }
+/* Anchored at the top: a long title wraps downwards, so the label never moves as its text arrives. */
+.video-play { position: absolute; inset: 1rem 1rem auto 1rem; padding: .75rem 1rem; border-radius: .75rem; background: rgb(0 0 0 / .75); text-align: left; font-weight: 700; }
 .video iframe { width: 100%; height: 100%; border: 0; border-radius: var(--radius); }
 .video-note { color: var(--muted); font-size: .9rem; }
 

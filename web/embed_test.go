@@ -14,13 +14,7 @@ func TestStaticContainsRequiredAssets(t *testing.T) {
 }
 
 func TestBudgets(t *testing.T) {
-	css, err := fs.ReadFile(Static, "static/css/site.css")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(css) > 10*1024 {
-		t.Errorf("site.css is %d bytes, budget 10 KB", len(css))
-	}
+	// The CSS size budget is checked compressed, with each page, in internal/build (spec: 14 KB on the wire).
 	url, err := AssetURL("js/theme.js")
 	if err != nil || len(url) != len("/static/js/theme.js?v=")+10 {
 		t.Errorf("AssetURL(js/theme.js) = %q, %v", url, err)

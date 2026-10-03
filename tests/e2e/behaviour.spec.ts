@@ -133,3 +133,56 @@ for (const path of ["/", "/doneren/"]) {
     expect(await page.evaluate(() => (window as unknown as { cls: number }).cls)).toBe(0);
   });
 }
+
+// A slow connection paints a page before all of it has arrived (user, 2026-10-03: shifting is the most annoying
+// thing on websites). Simulate every cut-off point: whatever is already drawn must not move when more arrives.
+const allPages = ["/", "/eerste-keer/", "/samenkomsten/", "/activiteiten/", "/agenda/", "/over-ons/", "/over-ons/israel/",
+  "/over-ons/baptisme/", "/doneren/", "/verhuur/", "/privacy/", "/bestaat-niet"];
+for (const path of allPages) {
+  test(`${path} never moves what is drawn while the rest arrives`, async ({ page }) => {
+    for (const width of [320, 390, 820, 1280]) {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto(path);
+      const moved = await page.evaluate(() => {
+        const visible = (e: Element) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
+        // Inline text rewrapping as more words arrive is how text renders; boxes (blocks, buttons, images) must stay.
+        const isBox = (e: Element) => getComputedStyle(e).display !== "inline";
+        // Elements and text, in document order: a page that has half arrived has both, up to the same point.
+        const all: Node[] = [];
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
+        while (walker.nextNode()) all.push(walker.currentNode);
+        const elements = all.filter((n): n is Element => n instanceof Element);
+        const before = new Map(elements.map((e) => [e, e.getBoundingClientRect()]));
+        const problems: string[] = [];
+        for (let cut = all.length - 1; cut > 0; cut--) {
+          if (!all[cut].isConnected) continue;
+          const missing = all[cut];
+          // Chromium holds the first paint until <main> starts (rel=expect); the header has its own test below.
+          if (!(document.querySelector("main")!.compareDocumentPosition(missing) & Node.DOCUMENT_POSITION_CONTAINED_BY)
+            && !(document.querySelector("main")!.compareDocumentPosition(missing) & Node.DOCUMENT_POSITION_FOLLOWING)) continue;
+          (missing as ChildNode).remove(); // removing from the end, in document order, rewinds to an earlier cut-off
+          for (const e of elements) {
+            if (!e.isConnected || !visible(e) || !isBox(e) || !(e.compareDocumentPosition(missing) & Node.DOCUMENT_POSITION_FOLLOWING)) continue;
+            const was = before.get(e)!;
+            const now = e.getBoundingClientRect();
+            if (Math.abs(now.x - was.x) > 0.5 || Math.abs(now.y - was.y) > 0.5) {
+              const what = missing instanceof Element ? `<${missing.nodeName.toLowerCase()} class="${missing.className}">` : `text "${missing.textContent!.trim().slice(0, 30)}"`;
+              problems.push(`<${e.nodeName.toLowerCase()} class="${e.className}"> moves when ${what} is missing`);
+            }
+          }
+          if (problems.length) break;
+        }
+        return problems.slice(0, 3);
+      });
+      expect(moved, `at ${width}px`).toEqual([]);
+    }
+  });
+}
+
+test("every image reserves its space before it loads", async ({ page }) => {
+  for (const path of allPages) {
+    await page.goto(path);
+    const unsized = await page.locator("img:not([width][height])").evaluateAll((imgs) => imgs.map((i) => (i as HTMLImageElement).src));
+    expect(unsized, path).toEqual([]);
+  }
+});

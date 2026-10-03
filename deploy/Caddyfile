@@ -20,7 +20,7 @@ kerkdefontein.nl, nieuw.kerkdefontein.nl {
 	}
 	header {
 		# Keep identical to internal/headers.CSP.
-		Content-Security-Policy "default-src 'self'; img-src 'self'; style-src 'self'; script-src 'self'; frame-src https://www.youtube-nocookie.com; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+		Content-Security-Policy "default-src 'self'; img-src 'self'; style-src 'self'; script-src 'self'; frame-src https://www.youtube-nocookie.com https://referral.socie.nl; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
 		Strict-Transport-Security "max-age=31536000"
 		X-Content-Type-Options "nosniff"
 		Referrer-Policy "strict-origin-when-cross-origin"

@@ -2,4 +2,4 @@
 package headers
 
 const CSP = "default-src 'self'; img-src 'self'; style-src 'self'; script-src 'self'; " +
-	"frame-src https://www.youtube-nocookie.com; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+	"frame-src https://www.youtube-nocookie.com https://referral.socie.nl; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"

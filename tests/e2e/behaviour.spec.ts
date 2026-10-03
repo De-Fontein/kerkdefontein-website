@@ -72,3 +72,42 @@ test("keyboard focus is visible on the video button and high-contrast in light m
   expect(ring.clippedByParent).toBe(false); // an overflow:hidden wrapper cut the ring off entirely
   expect(ring.color).toBe("rgb(5, 93, 117)"); // teal is 7.4:1 on white; the old sky ring was 2.6:1 (needs 3:1)
 });
+
+// Scipio's form is stubbed: CI never contacts Scipio, and a real click would create a pending donation.
+const scipio = "https://referral.socie.nl/**";
+function stubScipio(body: string) {
+  return (route: import("@playwright/test").Route) =>
+    route.fulfill({ contentType: "text/html", body: `<!doctype html><html lang="nl"><title>Scipio</title><main>${body}</main></html>` });
+}
+
+test("the Scipio giving form loads only after Geef online is clicked", async ({ page }) => {
+  const requests: string[] = [];
+  page.on("request", (r) => { if (r.url().includes("socie.nl")) requests.push(r.url()); });
+  await page.route(scipio, stubScipio("<button>Give</button>"));
+  await page.goto("/doneren/");
+  await page.waitForLoadState("networkidle");
+  expect(requests).toEqual([]);
+  await page.getByRole("link", { name: "Geef online" }).click();
+  const frame = page.locator("iframe[title='Online geven via Scipio']");
+  await expect(frame).toHaveAttribute("src", /^https:\/\/referral\.socie\.nl\/collections\/HC9DTZ7CKV\?/);
+  await expect(page).toHaveURL(/\/doneren\/$/);
+  await expect(page.frameLocator("iframe").getByRole("button", { name: "Give" })).toBeVisible();
+});
+
+// Scipio opens checkout with window.open(url, "_top") after an API call, so the click's activation may have expired.
+test("the Scipio form can send the whole page to checkout after a slow response", async ({ page, baseURL }) => {
+  await page.route(scipio, stubScipio(
+    `<button onclick="setTimeout(() => window.open('${baseURL}/agenda/', '_top'), 6000)">Give</button>`));
+  await page.goto("/doneren/");
+  await page.getByRole("link", { name: "Geef online" }).click();
+  await page.frameLocator("iframe").getByRole("button", { name: "Give" }).click();
+  await expect(page).toHaveURL(/\/agenda\/$/, { timeout: 10_000 });
+});
+
+test("without JavaScript Geef online links to the Scipio page", async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false, baseURL });
+  const page = await context.newPage();
+  await page.goto("/doneren/");
+  await expect(page.getByRole("link", { name: "Geef online" })).toHaveAttribute("href", "https://link.socie.nl/r/sci/c/HC9DTZ7CKV");
+  await context.close();
+});

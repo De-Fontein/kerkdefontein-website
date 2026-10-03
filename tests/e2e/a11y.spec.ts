@@ -23,3 +23,13 @@ test("an open flyer popover is accessible", async ({ page }) => {
   const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag22aa"]).analyze();
   expect(results.violations).toEqual([]);
 });
+
+test("the opened Scipio giving form is accessible", async ({ page }) => {
+  await page.route("https://referral.socie.nl/**", (route) => route.fulfill({
+    contentType: "text/html", body: `<!doctype html><html lang="nl"><title>Scipio</title><main><button>Give</button></main></html>` }));
+  await page.goto("/doneren/");
+  await page.getByRole("link", { name: "Geef online" }).click();
+  await expect(page.locator("iframe")).toBeVisible();
+  const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag22aa"]).analyze();
+  expect(results.violations).toEqual([]);
+});

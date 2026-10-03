@@ -68,10 +68,26 @@ func TestRender_DonerenHasANBIDataAndDocuments(t *testing.T) {
 	d.Documents = []DocumentView{{Title: "Jaarverslag 2025", Href: "/documenten/abc.pdf"}}
 	html := render(t, d, "doneren/index.html")
 	for _, want := range []string{"7467990", "50766775", "NL07RABO 0385 3320 41", `href="/documenten/abc.pdf"`, "Jaarverslag 2025",
-		"https://payment-links.mollie.com/nl/payment/qCZVRaf4fhm2f37QGayKz/details", "https://link.socie.nl/r/sci/c/HC9DTZ7CKV"} {
+		"https://link.socie.nl/r/sci/c/HC9DTZ7CKV"} {
 		if !strings.Contains(html, want) {
 			t.Errorf("doneren misses %s", want)
 		}
+	}
+}
+
+// Scipio replaced the Mollie link (user, 2026-10-03): one way to give online, with goals managed in Scipio.
+func TestRender_DonerenEmbedsScipioOnClickInsteadOfMollie(t *testing.T) {
+	html := render(t, sampleData(), "doneren/index.html")
+	for _, want := range []string{`data-giving-src="https://referral.socie.nl/collections/HC9DTZ7CKV?`, "js/giving.js", "Google"} {
+		if !strings.Contains(html, want) {
+			t.Errorf("doneren misses %s", want)
+		}
+	}
+	if strings.Contains(html, "mollie.com") {
+		t.Error("doneren still links to the Mollie payment link")
+	}
+	if strings.Contains(render(t, sampleData(), "index.html"), "js/giving.js") {
+		t.Error("giving.js must load on /doneren/ only")
 	}
 }
 

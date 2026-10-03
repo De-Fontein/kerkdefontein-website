@@ -2,18 +2,12 @@
   <button type="button" class="flyer-open" popovertarget="flyer-{{.ID}}" aria-label="Vergroot: {{.Alt}}">
     <picture><img src="/media/{{.Thumb.File}}" srcset="/media/{{.Thumb.File}} 360w, /media/{{.Thumb2x.File}} 720w" sizes="(min-width: 72rem) 22rem, (min-width: 48rem) 30vw, 45vw" alt="" width="{{.Thumb.Width}}" height="{{.Thumb.Height}}" loading="lazy" decoding="async"></picture>
   </button>
-  <div id="flyer-{{.ID}}" class="flyer-popover" popover>
-    <picture><img src="/media/{{.Large.File}}" alt="{{.Alt}}" width="{{.Large.Width}}" height="{{.Large.Height}}" loading="lazy" decoding="async"></picture>
-    <div class="flyer-controls">
-      {{if gt .Total 1}}<p class="flyer-nav">
-        <button type="button" class="flyer-step" popovertarget="flyer-{{.PrevID}}" aria-label="Vorige flyer" data-flyer-prev><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <span class="flyer-count">{{.Position}} van {{.Total}}</span>
-        <button type="button" class="flyer-step" popovertarget="flyer-{{.NextID}}" aria-label="Volgende flyer" data-flyer-next><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      </p>{{end}}
-      <p class="flyer-actions">
-        {{if .Link}}<a class="button" href="{{.Link}}">Meer info</a>{{end}}
-        <button type="button" class="button button-outline" popovertarget="flyer-{{.ID}}" popovertargetaction="hide">Sluiten</button>
-      </p>
-    </div>
+  <div id="flyer-{{.ID}}" class="flyer-popover" popover role="dialog" aria-label="Flyer: {{.Alt}}">
+    <a class="flyer-zoom" href="/media/{{.Large.File}}" aria-label="Flyer op ware grootte"><img src="/media/{{.Large.File}}" alt="{{.Alt}}" width="{{.Large.Width}}" height="{{.Large.Height}}" loading="lazy" decoding="async"></a>
+    {{if gt .Total 1}}<span class="flyer-count">{{.Position}} van {{.Total}}</span>
+    <button type="button" class="flyer-step" popovertarget="flyer-{{.PrevID}}" aria-label="Vorige flyer" data-flyer-prev><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button type="button" class="flyer-step" popovertarget="flyer-{{.NextID}}" aria-label="Volgende flyer" data-flyer-next><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>{{end}}
+    <button type="button" class="flyer-step flyer-close" popovertarget="flyer-{{.ID}}" popovertargetaction="hide" aria-label="Sluiten"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></button>
+    {{if .Link}}<a class="button flyer-info" href="{{.Link}}">Meer info</a>{{end}}
   </div>
 </li>{{end}}

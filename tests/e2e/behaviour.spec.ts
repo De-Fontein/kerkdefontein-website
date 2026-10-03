@@ -323,19 +323,50 @@ for (const [device, userAgent, expected] of [
   });
 }
 
-// Fitting the whole flyer to the screen height left it barely larger than its thumbnail on a laptop (user,
-// 2026-10-03). The enlarged flyer fills the popup's width and scrolls; its buttons stay pinned in view.
-test("an enlarged flyer is about twice its thumbnail on desktop, with its buttons in view", async ({ page }) => {
+// The enlarged flyer fits the screen with its controls beside it, so the whole flyer is visible at once (user,
+// 2026-10-03); clicking it zooms to a wide view for small print, and clicking again fits it back.
+test("an enlarged flyer fits the screen whole, and zooms for small print", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("/");
   const thumb = (await page.locator(".flyer-open img").first().boundingBox())!;
   await page.getByRole("button", { name: "Vergroot: Aanbiddingsavond vr 19.30" }).click();
   const open = page.locator(".flyer-popover:popover-open");
-  const large = (await open.locator("img").boundingBox())!;
-  expect(large.width).toBeGreaterThanOrEqual(thumb.width * 1.9);
-  for (const name of ["Volgende flyer", "Sluiten"]) {
+  const fitted = (await open.locator("img").boundingBox())!;
+  expect(fitted.width).toBeGreaterThanOrEqual(thumb.width * 1.45);
+  await expect(open.locator("img")).toBeInViewport({ ratio: 1 });
+  for (const name of ["Vorige flyer", "Volgende flyer", "Sluiten"]) {
     await expect(open.getByRole("button", { name })).toBeInViewport({ ratio: 1 });
   }
-  await open.evaluate((el) => el.scrollTo(0, el.scrollHeight));
-  await expect(open.getByRole("button", { name: "Volgende flyer" })).toBeInViewport({ ratio: 1 });
+  await open.locator(".flyer-zoom").click();
+  expect((await open.locator("img").boundingBox())!.width).toBeGreaterThanOrEqual(thumb.width * 2);
+  await expect(open.getByRole("button", { name: "Sluiten" })).toBeInViewport({ ratio: 1 });
+  await open.locator(".flyer-zoom").click();
+  expect((await open.locator("img").boundingBox())!.width).toBeCloseTo(fitted.width, 0);
+});
+
+test("clicking beside an enlarged flyer closes it", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Vergroot: Aanbiddingsavond vr 19.30" }).click();
+  await page.mouse.click(1250, 700);
+  await expect(page.locator(".flyer-popover:popover-open")).toHaveCount(0);
+});
+
+
+// The enlarged flyer covers the page, so keyboard focus must stay inside it (WCAG 2.2 Focus Not Obscured), start
+// inside it, and come back to the thumbnail of the flyer last shown when it closes.
+test("keyboard focus stays inside the enlarged flyer and returns to its thumbnail", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Vergroot: Aanbiddingsavond vr 19.30" }).focus();
+  await page.keyboard.press("Enter");
+  const insideOpenFlyer = () => page.evaluate(() => document.activeElement?.closest(".flyer-popover")?.matches(":popover-open") ?? false);
+  await expect.poll(insideOpenFlyer).toBe(true); // focus moves on the popover's toggle event, a moment later
+  for (const key of [...Array(8).fill("Tab"), ...Array(8).fill("Shift+Tab")]) {
+    await page.keyboard.press(key);
+    expect(await insideOpenFlyer(), `focus left the flyer after ${key}`).toBe(true);
+  }
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("button", { name: "Vergroot: Bijbelstudie Jakobus" })).toBeFocused();
 });

@@ -1,5 +1,5 @@
 // Moves through the enlarged flyers. Vorige/Volgende work natively (they open the neighbour on top of the
-// current flyer); this script closes the current one first, adds arrow keys and swipes, and preloads neighbours.
+// current flyer); this script closes the current one first, adds arrow keys, swipes and zoom, and preloads.
 type Direction = "prev" | "next";
 
 function openFlyer(): HTMLElement | null {
@@ -61,16 +61,66 @@ function onSwipe(): void {
   });
 }
 
+// An opened flyer takes focus, unless stepping already put it on a button, and tells screen readers it is modal.
+function takeFocus(flyer: HTMLElement): void {
+  flyer.setAttribute("aria-modal", "true");
+  if (!flyer.contains(document.activeElement)) flyer.querySelector<HTMLElement>(".flyer-close")?.focus();
+}
+
 // The neighbours load as soon as a flyer opens, so stepping to them shows the image at once.
-function preloadNeighbours(event: Event): void {
-  const flyer = event.target as HTMLElement;
-  if (!flyer.matches(".flyer-popover:popover-open")) return;
+function preloadNeighbours(flyer: HTMLElement): void {
   for (const direction of ["prev", "next"] as const) {
     neighbour(flyer, direction)?.querySelector("img")?.setAttribute("loading", "eager");
   }
 }
 
-document.addEventListener("toggle", preloadNeighbours, true); // toggle does not bubble
+// A closed flyer forgets its zoom and hands focus to its own thumbnail, unless stepping opened the next flyer.
+// The browser would return focus to the thumbnail that opened the first flyer instead.
+function onClose(flyer: HTMLElement): void {
+  flyer.classList.remove("zoomed");
+  if (!openFlyer()) document.querySelector<HTMLElement>(`.flyer-open[popovertarget="${flyer.id}"]`)?.focus();
+}
+
+function onToggle(event: Event): void {
+  const flyer = event.target as HTMLElement;
+  if (!flyer.matches(".flyer-popover")) return;
+  if (!flyer.matches(":popover-open")) return onClose(flyer);
+  takeFocus(flyer);
+  preloadNeighbours(flyer);
+}
+
+// Tab and Shift+Tab cycle through the open flyer's own controls: it covers the page, so focus behind it would
+// be invisible (WCAG 2.2 Focus Not Obscured).
+function trapTab(event: KeyboardEvent): void {
+  const flyer = openFlyer();
+  if (!flyer || event.key !== "Tab") return;
+  const controls = [...flyer.querySelectorAll<HTMLElement>("a[href], button")];
+  const step = event.shiftKey ? -1 : 1;
+  const current = controls.indexOf(document.activeElement as HTMLElement);
+  event.preventDefault();
+  controls.at((current + step) % controls.length)?.focus();
+}
+
+// A click on the flyer switches between fitting the screen and a wide, scrollable view. Without this script
+// it is a plain link to the image file.
+function onZoom(event: MouseEvent): void {
+  const flyer = (event.target as Element).closest(".flyer-zoom")?.closest<HTMLElement>(".flyer-popover");
+  if (!flyer) return;
+  event.preventDefault();
+  flyer.classList.toggle("zoomed");
+}
+
+// The flyer covers the whole screen, so the browser's "click outside closes it" never fires; a click on its
+// empty space does the same.
+function onEmptySpace(event: MouseEvent): void {
+  const target = event.target as HTMLElement;
+  if (target.matches(".flyer-popover:popover-open")) target.hidePopover();
+}
+
+document.addEventListener("toggle", onToggle, true); // toggle does not bubble
+document.addEventListener("click", onZoom);
+document.addEventListener("click", onEmptySpace);
 document.addEventListener("click", onNavButton);
 document.addEventListener("keydown", onArrowKey);
+document.addEventListener("keydown", trapTab);
 onSwipe();

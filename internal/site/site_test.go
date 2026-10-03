@@ -106,3 +106,11 @@ func TestRender_NotFoundPage(t *testing.T) {
 		t.Error("404 page misses its heading or links")
 	}
 }
+
+// The ▶ icon must not be part of the button's accessible name, or screen readers announce it.
+func TestRender_VideoButtonNameStartsWithAfspelen(t *testing.T) {
+	html := render(t, sampleData(), "index.html")
+	if !strings.Contains(html, `<span aria-hidden="true">▶&nbsp;</span>Afspelen: Vrolijk zijn in Gods tent!`) {
+		t.Error("play icon must be aria-hidden, followed by the Afspelen label")
+	}
+}

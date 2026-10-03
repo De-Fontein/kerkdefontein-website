@@ -8,7 +8,7 @@
   <div class="video">
     <button type="button" class="video-facade" data-youtube-id="{{.ID}}" data-youtube-title="{{.Title}}">
       {{if .Thumb.File}}<img src="/media/{{.Thumb.File}}" alt="" width="{{.Thumb.Width}}" height="{{.Thumb.Height}}" fetchpriority="low">{{end}}
-      <span class="video-play">Afspelen: {{.Title}}</span>
+      <span class="video-play"><span aria-hidden="true">▶&nbsp;</span>Afspelen: {{.Title}}</span>
     </button>
   </div>
   <p class="video-note">De video wordt pas van YouTube geladen als je op afspelen klikt.</p>

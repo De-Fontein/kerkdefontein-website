@@ -307,3 +307,18 @@ test("the gallery buttons stay put while images load and between flyers", async 
     expect(await next(), `moved to the next flyer at ${width}px`).toEqual(first);
   }
 });
+
+// "Route plannen" opens the visitor's own maps app (user, 2026-10-03); OpenStreetMap stays the fallback.
+for (const [device, userAgent, expected] of [
+  ["iPhone", "Mozilla/5.0 (iPhone; CPU iPhone OS 26_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148", /^https:\/\/maps\.apple\.com\/\?daddr=Roozenburglaan/],
+  ["Android", "Mozilla/5.0 (Linux; Android 16; Pixel 9) AppleWebKit/537.36 Chrome/140.0 Mobile Safari/537.36", /^geo:0,0\?q=Roozenburglaan/],
+  ["Windows", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140.0 Safari/537.36", /^https:\/\/www\.openstreetmap\.org\//],
+] as const) {
+  test(`Route plannen opens the maps app on ${device}`, async ({ browser, baseURL }) => {
+    const context = await browser.newContext({ userAgent, baseURL });
+    const page = await context.newPage();
+    await page.goto("/eerste-keer/");
+    await expect(page.getByRole("link", { name: "Route plannen" })).toHaveAttribute("href", expected);
+    await context.close();
+  });
+}

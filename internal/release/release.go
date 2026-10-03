@@ -12,7 +12,11 @@ import (
 func Publish(root, name string, keep int, build func(dir string) error) (string, error) {
 	releases := filepath.Join(root, "releases")
 	dir := filepath.Join(releases, name)
-	if err := os.MkdirAll(dir, 0o755); err != nil {
+	if err := os.MkdirAll(releases, 0o755); err != nil {
+		return "", fmt.Errorf("create releases dir: %w", err)
+	}
+	// Mkdir, not MkdirAll: an existing name may be the live release, which must never be written into or removed.
+	if err := os.Mkdir(dir, 0o755); err != nil {
 		return "", fmt.Errorf("create release dir: %w", err)
 	}
 	if err := build(dir); err != nil {
@@ -23,7 +27,7 @@ func Publish(root, name string, keep int, build func(dir string) error) (string,
 		os.RemoveAll(dir)
 		return "", err
 	}
-	return dir, prune(releases, keep)
+	return dir, prune(releases, name, keep)
 }
 
 // switchCurrent relies on rename(2) replacing the old symlink atomically.
@@ -39,15 +43,19 @@ func switchCurrent(root, target string) error {
 	return nil
 }
 
-func prune(releases string, keep int) error {
+// prune removes the oldest releases by name, but never current: after a clock jump it may not sort last.
+func prune(releases, current string, keep int) error {
 	entries, err := os.ReadDir(releases)
 	if err != nil {
 		return fmt.Errorf("list releases: %w", err)
 	}
 	names := make([]string, 0, len(entries))
 	for _, e := range entries {
-		names = append(names, e.Name())
+		if e.Name() != current {
+			names = append(names, e.Name())
+		}
 	}
+	keep-- // current is kept outside the list
 	sort.Strings(names)
 	for len(names) > keep {
 		if err := os.RemoveAll(filepath.Join(releases, names[0])); err != nil {

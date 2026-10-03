@@ -73,3 +73,32 @@ func TestPublish_KeepsOnlyNewestReleases(t *testing.T) {
 		t.Errorf("releases = %v, want 003..007", entries)
 	}
 }
+
+// Two runs in the same second (timer + make deploy) must not write into, or delete, the live release.
+func TestPublish_ExistingNameFailsWithoutTouchingCurrent(t *testing.T) {
+	root := t.TempDir()
+	if _, err := Publish(root, "001", 5, writeIndex("live")); err != nil {
+		t.Fatal(err)
+	}
+	_, err := Publish(root, "001", 5, func(string) error { return errors.New("render failed") })
+	if err == nil {
+		t.Fatal("expected an error for a release name that already exists")
+	}
+	if got := readCurrent(t, root); got != "live" {
+		t.Errorf("current = %q, want live", got)
+	}
+}
+
+// If the clock jumps back, the newest release sorts first; pruning must still keep what current points to.
+func TestPublish_PruneNeverRemovesCurrent(t *testing.T) {
+	root := t.TempDir()
+	if _, err := Publish(root, "005", 1, writeIndex("new")); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Publish(root, "001", 1, writeIndex("after clock jump")); err != nil {
+		t.Fatal(err)
+	}
+	if got := readCurrent(t, root); got != "after clock jump" {
+		t.Errorf("current = %q", got)
+	}
+}

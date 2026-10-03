@@ -14,7 +14,7 @@ func jsonLD(p Page, d Data) (template.JS, error) {
 		"@type": "Church", "@id": churchID,
 		"name": "Baptistengemeente De Fontein", "url": d.BaseURL + "/", "email": "info@kerkdefontein.nl",
 		"address": map[string]any{
-			"@type": "PostalAddress", "streetAddress": "Roojenburglaan 22", "postalCode": "4337 JH",
+			"@type": "PostalAddress", "streetAddress": "Roozenburglaan 22", "postalCode": "4337 JH",
 			"addressLocality": "Middelburg", "addressCountry": "NL",
 		},
 		"event": map[string]any{

@@ -53,6 +53,14 @@ type NavItem struct {
 
 var Pages = []Page{
 	{"/", "home", "Baptistengemeente De Fontein Middelburg", "Samenkomst elke zondag om 10:00 in de Hoeksteen, Middelburg. Je bent van harte welkom!"},
+	{"/eerste-keer/", "eerste-keer", "Eerste keer? · De Fontein", "Wat je kunt verwachten als je voor het eerst een samenkomst van De Fontein bezoekt."},
+	{"/samenkomsten/", "samenkomsten", "Samenkomsten · De Fontein", "Elke zondag om 10:00 komen we samen in de Hoeksteen in Middelburg."},
+	{"/activiteiten/", "activiteiten", "Activiteiten · De Fontein", "Bijbelstudies en andere activiteiten van De Fontein."},
+	{"/agenda/", "agenda", "Agenda · De Fontein", "Alle komende samenkomsten en activiteiten van De Fontein."},
+	{"/over-ons/", "over-ons", "Over ons · De Fontein", "Wie we zijn, waar we voor staan, onze missie en waarden."},
+	{"/doneren/", "doneren", "Doneren · De Fontein", "Steun het werk van Baptistengemeente De Fontein. ANBI-gegevens en jaarstukken."},
+	{"/verhuur/", "verhuur", "Verhuur · De Fontein", "Informatie over het gebruik van gebouw de Hoeksteen."},
+	{"/privacy/", "privacy", "Privacy · De Fontein", "Hoe De Fontein omgaat met je gegevens op deze website."},
 	{"/404", "notfound", "Pagina niet gevonden · De Fontein", "Deze pagina bestaat niet (meer)."},
 }
 

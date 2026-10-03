@@ -1,0 +1,7 @@
+{{define "main"}}<div class="page">
+  <h1>Agenda</h1>
+  <p class="prose">U bent van harte welkom in de hoeksteen. Via ons <a href="https://www.youtube.com/@defonteinmiddelburg">YouTube kanaal</a> kunt u de samenkomst live meekijken en terugkijken.</p>
+  {{template "events" .Data.Events}}
+  {{with .Data.CalendarICalURL}}<p class="prose">Wil je de agenda in je eigen agenda-app? <a href="{{.}}">Abonneer op de agenda</a>
+  (kopieer de link en voeg hem toe als agenda-abonnement).</p>{{end}}
+</div>{{end}}

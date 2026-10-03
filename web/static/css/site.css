@@ -24,7 +24,7 @@ body { margin: 0; background: var(--bg); color: var(--text); font: 1.0625rem/1.6
 img { max-width: 100%; height: auto; display: block; }
 a { color: var(--accent); text-underline-offset: .15em; }
 :focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; border-radius: .25rem; }
-h1, h2, h3 { line-height: 1.1; letter-spacing: -.01em; }
+h1, h2, h3 { line-height: 1.1; letter-spacing: -.01em; text-wrap: balance; }
 h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0 0 1rem; }
 .skip-link { position: absolute; left: 1rem; top: -4rem; z-index: 10; background: var(--bg); padding: .5rem 1rem; }
 .skip-link:focus { top: 1rem; }
@@ -84,7 +84,8 @@ h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0 0 1rem; }
 .facts dd { margin: 0; }
 .documents { padding-left: 1.25rem; }
 
-.site-footer { margin-top: 3rem; background: var(--surface); padding: var(--space); display: grid; gap: 1.5rem; }
+/* Full-width background, content aligned with the --max column above it. */
+.site-footer { margin-top: 3rem; background: var(--surface); padding: var(--space) max(var(--space), calc((100% - var(--max)) / 2 + var(--space))); display: grid; gap: 1.5rem; }
 @media (min-width: 48rem) { .site-footer { grid-template-columns: 1fr 1fr; } }
 .site-footer address { font-style: normal; }
 .site-footer ul { list-style: none; margin: 0; padding: 0; }

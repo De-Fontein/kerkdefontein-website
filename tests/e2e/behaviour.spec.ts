@@ -322,3 +322,20 @@ for (const [device, userAgent, expected] of [
     await context.close();
   });
 }
+
+// Fitting the whole flyer to the screen height left it barely larger than its thumbnail on a laptop (user,
+// 2026-10-03). The enlarged flyer fills the popup's width and scrolls; its buttons stay pinned in view.
+test("an enlarged flyer is about twice its thumbnail on desktop, with its buttons in view", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+  const thumb = (await page.locator(".flyer-open img").first().boundingBox())!;
+  await page.getByRole("button", { name: "Vergroot: Aanbiddingsavond vr 19.30" }).click();
+  const open = page.locator(".flyer-popover:popover-open");
+  const large = (await open.locator("img").boundingBox())!;
+  expect(large.width).toBeGreaterThanOrEqual(thumb.width * 1.9);
+  for (const name of ["Volgende flyer", "Sluiten"]) {
+    await expect(open.getByRole("button", { name })).toBeInViewport({ ratio: 1 });
+  }
+  await open.evaluate((el) => el.scrollTo(0, el.scrollHeight));
+  await expect(open.getByRole("button", { name: "Volgende flyer" })).toBeInViewport({ ratio: 1 });
+});

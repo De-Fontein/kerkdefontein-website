@@ -35,6 +35,8 @@ function apply(theme: Theme): void {
 
 let current = savedTheme();
 apply(current);
+// Shows the toggle from the first paint (CSS); unhiding it after load would push the page down.
+document.documentElement.dataset.js = "";
 
 type ThemeControls = { toggle: HTMLButtonElement; menu: HTMLElement };
 
@@ -42,7 +44,6 @@ function render({ toggle, menu }: ThemeControls): void {
   const label = `Thema: ${labels[current]}`;
   toggle.setAttribute("aria-label", label);
   toggle.title = label;
-  toggle.dataset.state = current; // CSS shows the matching icon
   const radio = menu.querySelector<HTMLInputElement>(`input[value="${current}"]`);
   if (radio) radio.checked = true;
 }
@@ -69,9 +70,8 @@ function placeUnder({ toggle, menu }: ThemeControls): void {
 }
 
 function initMenu(controls: ThemeControls): void {
-  const { toggle, menu } = controls;
+  const { menu } = controls;
   render(controls);
-  toggle.hidden = false;
   menu.addEventListener("change", (event) => choose((event.target as HTMLInputElement).value, controls));
   menu.addEventListener("click", (event) => closeAfterClick(event, menu));
   menu.addEventListener("beforetoggle", (event) => {

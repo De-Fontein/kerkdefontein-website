@@ -111,3 +111,25 @@ test("without JavaScript Geef online links to the Scipio page", async ({ browser
   await expect(page.getByRole("link", { name: "Geef online" })).toHaveAttribute("href", "https://link.socie.nl/r/sci/c/HC9DTZ7CKV");
   await context.close();
 });
+
+// On a slow connection the page paints before its scripts finish; nothing may move when they do (user, 2026-10-03).
+for (const path of ["/", "/doneren/"]) {
+  test(`${path} does not shift when its scripts finish loading late`, async ({ page, browserName }) => {
+    test.skip(browserName !== "chromium", "layout-shift entries are Chromium-only");
+    await page.route(/\/static\/js\/(youtube|giving)\.js/, async (route) => {
+      await new Promise((r) => setTimeout(r, 1500));
+      await route.continue();
+    });
+    await page.addInitScript(() => {
+      (window as unknown as { cls: number }).cls = 0;
+      new PerformanceObserver((list) => {
+        for (const e of list.getEntries() as unknown as { hadRecentInput: boolean; value: number }[]) {
+          if (!e.hadRecentInput) (window as unknown as { cls: number }).cls += e.value;
+        }
+      }).observe({ type: "layout-shift", buffered: true });
+    });
+    await page.goto(path, { waitUntil: "load" });
+    await page.waitForTimeout(300);
+    expect(await page.evaluate(() => (window as unknown as { cls: number }).cls)).toBe(0);
+  });
+}

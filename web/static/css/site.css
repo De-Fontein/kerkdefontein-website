@@ -61,10 +61,12 @@ h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0 0 1rem; }
 .menu a { color: var(--text); font-weight: 600; text-decoration: none; }
 .menu a:hover, .menu a[aria-current="page"] { text-decoration: underline; }
 /* SVG icons, not font glyphs: glyph metrics differ per font, so text icons never sit exactly centred. */
-.theme-toggle { display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; padding: 0; cursor: pointer; }
+/* Hidden without JS (it could not apply a theme). The icon follows the root theme, set before first paint. */
+.theme-toggle { display: none; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; padding: 0; cursor: pointer; }
+:root[data-js] .theme-toggle { display: inline-flex; }
 .theme-toggle svg { display: none; }
-.theme-toggle[data-state="auto"] .icon-auto, .theme-toggle[data-state="light"] .icon-light,
-.theme-toggle[data-state="dark"] .icon-dark, .theme-toggle[data-state="oled"] .icon-oled { display: block; }
+:root:not([data-theme]) .icon-auto, :root[data-theme="light"] .icon-light,
+:root[data-theme="dark"] .icon-dark, :root[data-theme="oled"] .icon-oled { display: block; }
 /* Not display:none: masks inside an undisplayed SVG do not render in every browser. */
 .svg-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
 .theme-menu { position: fixed; inset: auto; margin: 0; padding: .75rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); color: var(--text); box-shadow: 0 1rem 3rem rgb(0 0 0 / .25); }
@@ -74,7 +76,6 @@ h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0 0 1rem; }
 .theme-menu label:hover, .theme-menu label:has(:checked) { background: var(--surface); }
 .theme-menu label:has(:checked) { font-weight: 700; }
 .theme-menu input { accent-color: var(--teal); margin: 0; }
-.theme-toggle[hidden] { display: none; }
 @media (min-width: 60rem) {
   /* On wide screens the toggle sits quietly after the links; on phones it stays a pill next to Menu. */
   .site-header nav { order: 1; }

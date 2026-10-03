@@ -143,9 +143,6 @@ func TestRender_ThemeToggleAndBlockingScriptInHead(t *testing.T) {
 	if !regexp.MustCompile(`<script src="/static/js/theme\.js\?v=[0-9a-f]+"></script>`).MatchString(head) {
 		t.Error("head must load theme.js as a plain blocking script")
 	}
-	if !regexp.MustCompile(`<button[^>]*\bdata-theme-toggle\b[^>]*\shidden[\s>]`).MatchString(html) {
-		t.Error("theme toggle must start hidden, so it never shows without JavaScript")
-	}
 }
 
 // The menu stays in the top-right corner (user, 2026-10-03), so the theme toggle precedes it in the DOM.

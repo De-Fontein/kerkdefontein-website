@@ -22,3 +22,14 @@ func TestCSP_CaddyfileSendsTheSamePolicy(t *testing.T) {
 		t.Error("deploy/Caddyfile CSP differs from headers.CSP")
 	}
 }
+
+// Every asset URL with ?v=<hash> never changes, so Caddy may cache all of them for a year, images included.
+func TestCaddyfile_CachesEveryVersionedStaticFileForAYear(t *testing.T) {
+	caddyfile, err := os.ReadFile("../../deploy/Caddyfile")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(caddyfile), "@busted {\n\t\tpath /static/*\n\t\tquery v=*\n\t}") {
+		t.Error("deploy/Caddyfile must treat every /static/* URL with ?v= as immutable")
+	}
+}

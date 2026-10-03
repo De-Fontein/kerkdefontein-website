@@ -117,3 +117,30 @@ func TestRender_AgendaLinksTheNewsletterArchive(t *testing.T) {
 		t.Error("agenda misses the nieuwsflits archive link")
 	}
 }
+
+// Safari's Reader View shows only one block when activities are wrapped separately (user, 2026-10-03), so all
+// activity text lives in one flat <article>. The grouped list appears twice: a popover on phones, a column on desktop.
+func TestRender_ActiviteitenIsOneFlatArticleWithGroupedNavigation(t *testing.T) {
+	html := render(t, sampleData(), "activiteiten/index.html")
+	start, end := strings.Index(html, "<article"), strings.Index(html, "</article>")
+	if start < 0 || end < start || strings.Count(html, "<article") != 1 {
+		t.Fatal("activiteiten needs exactly one <article>")
+	}
+	article := html[start:end]
+	if strings.Contains(article, "<section") {
+		t.Error("activities must not be wrapped in sections inside the article")
+	}
+	for _, id := range []string{"kinderen", "tieners-en-jeugd", "jong-volwassenen", "kjp", "bijbelstudies", "kringen", "vrouwen", "bidstonden", "evangelisatie", "pastoraat"} {
+		if !strings.Contains(article, `<h2 id="`+id+`">`) {
+			t.Errorf("article misses heading #%s", id)
+		}
+		if n := strings.Count(html, `href="#`+id+`"`); n != 2 {
+			t.Errorf("#%s is linked %d times, want 2 (phone and desktop list)", id, n)
+		}
+	}
+	for _, want := range []string{`class="act-facts"`, `popovertarget="act-jump-list"`, `href="#top"`, "Kinderen en jeugd", "Samen groeien", "Gebed, evangelisatie en zorg", "js/activiteiten.js"} {
+		if !strings.Contains(html, want) {
+			t.Errorf("activiteiten misses %s", want)
+		}
+	}
+}

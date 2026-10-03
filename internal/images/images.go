@@ -12,9 +12,12 @@ import (
 	"strings"
 )
 
+// Thumbnails come in two sizes so the browser can pick one per screen: a flyer column is at most ~360 px wide,
+// and retina screens need twice that.
 const (
-	ThumbWidth = 480
-	LargeWidth = 1600
+	ThumbWidth   = 360
+	Thumb2xWidth = 720
+	LargeWidth   = 1600
 )
 
 type Variant struct {
@@ -23,29 +26,34 @@ type Variant struct {
 	Height int
 }
 
-type Pair struct {
-	Thumb Variant
-	Large Variant
+type Set struct {
+	Thumb   Variant
+	Thumb2x Variant
+	Large   Variant
 }
 
-func Convert(ctx context.Context, src, mimeType, outDir, base string) (Pair, error) {
+func Convert(ctx context.Context, src, mimeType, outDir, base string) (Set, error) {
 	input := src
 	if mimeType == "application/pdf" {
 		pagePrefix := filepath.Join(outDir, base+"-page")
 		if err := run(ctx, "pdftoppm", "-f", "1", "-l", "1", "-r", "150", "-png", "-singlefile", src, pagePrefix); err != nil {
-			return Pair{}, fmt.Errorf("render first pdf page: %w", err)
+			return Set{}, fmt.Errorf("render first pdf page: %w", err)
 		}
 		input = pagePrefix + ".png"
 	}
 	thumb, err := resize(ctx, input, outDir, base, ThumbWidth)
 	if err != nil {
-		return Pair{}, err
+		return Set{}, err
+	}
+	thumb2x, err := resize(ctx, input, outDir, base, Thumb2xWidth)
+	if err != nil {
+		return Set{}, err
 	}
 	large, err := resize(ctx, input, outDir, base, LargeWidth)
 	if err != nil {
-		return Pair{}, err
+		return Set{}, err
 	}
-	return Pair{Thumb: thumb, Large: large}, nil
+	return Set{Thumb: thumb, Thumb2x: thumb2x, Large: large}, nil
 }
 
 // resize fits the image to width; the huge --height leaves height unconstrained and --size down prevents upscaling.

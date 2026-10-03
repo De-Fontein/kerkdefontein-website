@@ -1,8 +1,8 @@
-{{define "main"}}<div class="page">
+{{define "main"}}<div class="page prose">
   <h1>Agenda</h1>
-  <p class="prose">U bent van harte welkom in de hoeksteen. Via ons <a href="https://www.youtube.com/@defonteinmiddelburg">YouTube kanaal</a> kunt u de samenkomst live meekijken en terugkijken.</p>
-  <p class="prose">U kunt de <a href="https://us10.campaign-archive.com/home/?u=d7a8cec352a291f1f6358cffb&amp;id=68a3c61809">nieuwsflits van de afgelopen weken</a> ook online lezen.</p>
+  <p>U bent van harte welkom in de hoeksteen. Via ons <a href="https://www.youtube.com/@defonteinmiddelburg">YouTube kanaal</a> kunt u de samenkomst live meekijken en terugkijken.</p>
+  <p>U kunt de <a href="https://us10.campaign-archive.com/home/?u=d7a8cec352a291f1f6358cffb&amp;id=68a3c61809">nieuwsflits van de afgelopen weken</a> ook online lezen.</p>
   {{template "events" .Data.Events}}
-  {{with .Data.CalendarICalURL}}<p class="prose">Wil je de agenda in je eigen agenda-app? <a href="{{.}}">Abonneer op de agenda</a>
+  {{with .Data.CalendarICalURL}}<p>Wil je de agenda in je eigen agenda-app? <a href="{{.}}">Abonneer op de agenda</a>
   (kopieer de link en voeg hem toe als agenda-abonnement).</p>{{end}}
 </div>{{end}}

@@ -21,9 +21,16 @@ type media struct {
 	log      *slog.Logger
 }
 
+// The cache directories carry a version: bump it whenever conversion output changes, or flyers converted by an
+// older binary keep their old sizes forever.
+const (
+	flyerCache = "flyers-v2"
+	videoCache = "video-v2"
+)
+
 type preparedFlyer struct {
 	flyer   content.Flyer
-	pair    images.Pair
+	set     images.Set
 	fromDir string
 }
 
@@ -57,8 +64,8 @@ func (m media) prepare(ctx context.Context, flyers []content.Flyer, docs []conte
 	var p prepared
 	var problems []content.Problem
 	for _, f := range flyers {
-		dir := filepath.Join(m.cacheDir, "flyers", f.File.MD5)
-		pair, err := m.converted(dir, func(tmp string) (images.Pair, error) {
+		dir := filepath.Join(m.cacheDir, flyerCache, f.File.MD5)
+		set, err := m.converted(dir, func(tmp string) (images.Set, error) {
 			return m.convertDriveFile(ctx, tmp, f.File.ID, f.File.MimeType, f.File.MD5)
 		})
 		if errors.As(err, new(sourceError)) {
@@ -68,7 +75,7 @@ func (m media) prepare(ctx context.Context, flyers []content.Flyer, docs []conte
 			problems = append(problems, content.Problem{Name: f.File.Name, Reason: err.Error()})
 			continue
 		}
-		p.flyers = append(p.flyers, preparedFlyer{flyer: f, pair: pair, fromDir: dir})
+		p.flyers = append(p.flyers, preparedFlyer{flyer: f, set: set, fromDir: dir})
 	}
 	for _, d := range docs {
 		path, err := m.document(ctx, d)
@@ -83,52 +90,52 @@ func (m media) prepare(ctx context.Context, flyers []content.Flyer, docs []conte
 
 // converted caches by content hash: unchanged flyers are never downloaded or converted again, and a
 // cache entry appears only complete (tmp dir renamed into place).
-func (m media) converted(dir string, convert func(tmp string) (images.Pair, error)) (images.Pair, error) {
-	if raw, err := os.ReadFile(filepath.Join(dir, "pair.json")); err == nil {
-		var pair images.Pair
-		if json.Unmarshal(raw, &pair) == nil {
-			return pair, nil
+func (m media) converted(dir string, convert func(tmp string) (images.Set, error)) (images.Set, error) {
+	if raw, err := os.ReadFile(filepath.Join(dir, "set.json")); err == nil {
+		var set images.Set
+		if json.Unmarshal(raw, &set) == nil {
+			return set, nil
 		}
 	}
 	if err := os.MkdirAll(filepath.Dir(dir), 0o755); err != nil {
-		return images.Pair{}, err
+		return images.Set{}, err
 	}
 	tmp, err := os.MkdirTemp(filepath.Dir(dir), ".convert-")
 	if err != nil {
-		return images.Pair{}, err
+		return images.Set{}, err
 	}
 	defer os.RemoveAll(tmp)
-	pair, err := convert(tmp)
+	set, err := convert(tmp)
 	if err != nil {
-		return images.Pair{}, err
+		return images.Set{}, err
 	}
-	raw, err := json.Marshal(pair)
+	raw, err := json.Marshal(set)
 	if err != nil {
-		return images.Pair{}, err
+		return images.Set{}, err
 	}
-	if err := os.WriteFile(filepath.Join(tmp, "pair.json"), raw, 0o644); err != nil {
-		return images.Pair{}, err
+	if err := os.WriteFile(filepath.Join(tmp, "set.json"), raw, 0o644); err != nil {
+		return images.Set{}, err
 	}
-	return pair, os.Rename(tmp, dir)
+	return set, os.Rename(tmp, dir)
 }
 
-func (m media) convertDriveFile(ctx context.Context, tmp, fileID, mimeType, base string) (images.Pair, error) {
+func (m media) convertDriveFile(ctx context.Context, tmp, fileID, mimeType, base string) (images.Set, error) {
 	src := filepath.Join(tmp, "source")
 	out, err := os.Create(src)
 	if err != nil {
-		return images.Pair{}, err
+		return images.Set{}, err
 	}
 	err = m.src.Drive.Download(ctx, fileID, out)
 	out.Close()
 	if err != nil {
-		return images.Pair{}, sourceError{err}
+		return images.Set{}, sourceError{err}
 	}
-	pair, err := images.Convert(ctx, src, mimeType, tmp, base)
+	set, err := images.Convert(ctx, src, mimeType, tmp, base)
 	if err != nil {
-		return images.Pair{}, fmt.Errorf("convert: %w", err)
+		return images.Set{}, fmt.Errorf("convert: %w", err)
 	}
 	os.Remove(src)
-	return pair, nil
+	return set, nil
 }
 
 func (m media) document(ctx context.Context, d content.Document) (string, error) {
@@ -154,21 +161,21 @@ func (m media) document(ctx context.Context, d content.Document) (string, error)
 
 // videoThumb is best effort: without a thumbnail the play button still works on a dark background.
 func (m media) videoThumb(ctx context.Context, v youtube.Video) preparedVideo {
-	dir := filepath.Join(m.cacheDir, "video", v.ID)
-	pair, err := m.converted(dir, func(tmp string) (images.Pair, error) {
+	dir := filepath.Join(m.cacheDir, videoCache, v.ID)
+	set, err := m.converted(dir, func(tmp string) (images.Set, error) {
 		src := filepath.Join(tmp, "source.jpg")
 		resp, err := fetch.Get(ctx, m.src.Web, m.src.ThumbBase+"/vi/"+v.ID+"/hqdefault.jpg")
 		if err != nil {
-			return images.Pair{}, err
+			return images.Set{}, err
 		}
 		defer resp.Body.Close()
 		out, err := os.Create(src)
 		if err != nil {
-			return images.Pair{}, err
+			return images.Set{}, err
 		}
 		if _, err := out.ReadFrom(resp.Body); err != nil {
 			out.Close()
-			return images.Pair{}, err
+			return images.Set{}, err
 		}
 		out.Close()
 		return images.Convert(ctx, src, "image/jpeg", tmp, "yt-"+v.ID)
@@ -177,5 +184,6 @@ func (m media) videoThumb(ctx context.Context, v youtube.Video) preparedVideo {
 		m.log.Warn("video thumbnail unavailable", "video", v.ID, "err", err)
 		return preparedVideo{video: v}
 	}
-	return preparedVideo{video: v, thumb: pair.Thumb, fromDir: dir}
+	// YouTube's hqdefault is 480 px wide; the 720 slot keeps it at full size for the wide video frame.
+	return preparedVideo{video: v, thumb: set.Thumb2x, fromDir: dir}
 }

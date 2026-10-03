@@ -21,14 +21,15 @@ func sampleData() Data {
 			ICSHref: "/agenda/" + name + ".ics",
 		})
 	}
-	thumb := images.Variant{File: "m1-480.webp", Width: 480, Height: 679}
+	thumb := images.Variant{File: "m1-360.webp", Width: 360, Height: 509}
+	thumb2x := images.Variant{File: "m1-720.webp", Width: 720, Height: 1018}
 	large := images.Variant{File: "m1-1600.webp", Width: 1131, Height: 1600}
 	return Data{
 		BaseURL: "https://kerkdefontein.nl",
 		Video:   &VideoView{ID: "qeWRxvxJvNs", Title: "Vrolijk zijn in Gods tent!", Thumb: images.Variant{File: "yt-480.webp", Width: 480, Height: 360}},
 		Flyers: []FlyerView{
-			{ID: "f1", Alt: "Aanbiddingsavond", Link: "https://example.org/aanbidding", Thumb: thumb, Large: large},
-			{ID: "f2", Alt: "Bijbelstudie", Thumb: thumb, Large: large},
+			{ID: "f1", Alt: "Aanbiddingsavond", Link: "https://example.org/aanbidding", Thumb: thumb, Thumb2x: thumb2x, Large: large},
+			{ID: "f2", Alt: "Bijbelstudie", Thumb: thumb, Thumb2x: thumb2x, Large: large},
 		},
 		Events: events,
 	}
@@ -54,8 +55,8 @@ func TestRender_HomeShowsVideoFlyersAndThreeEvents(t *testing.T) {
 		`data-youtube-id="qeWRxvxJvNs"`,
 		`popovertarget="flyer-f1"`,
 		`href="https://example.org/aanbidding"`,
-		`src="/media/m1-480.webp"`,
-		`width="480" height="679"`,
+		`src="/media/m1-360.webp"`,
+		`width="360" height="509"`,
 		`property="og:title"`,
 		`property="og:image" content="https://kerkdefontein.nl/static/img/share.jpg"`,
 		`"@type":"Church"`,
@@ -107,11 +108,16 @@ func TestRender_NotFoundPage(t *testing.T) {
 	}
 }
 
-// The ▶ icon must not be part of the button's accessible name, or screen readers announce it.
+// The ▶ icon must not be part of the button's accessible name, or screen readers announce it. The title is a
+// caption below the thumbnail (a long title filled and overflowed it), and stays in the button's aria-label;
+// a visually hidden span would not do, as browsers put a space before it ("Afspelen : …").
 func TestRender_VideoButtonNameStartsWithAfspelen(t *testing.T) {
 	html := render(t, sampleData(), "index.html")
-	if !strings.Contains(html, `<span aria-hidden="true">▶&nbsp;</span>Afspelen: Vrolijk zijn in Gods tent!`) {
-		t.Error("play icon must be aria-hidden, followed by the Afspelen label")
+	if !strings.Contains(html, `aria-label="Afspelen: Vrolijk zijn in Gods tent!"`) || !strings.Contains(html, `<span class="video-play" aria-hidden="true">▶&nbsp;Afspelen</span>`) {
+		t.Error("the button must be named Afspelen: <title>, with the visible ▶ Afspelen hidden from screen readers")
+	}
+	if !strings.Contains(html, `<p class="video-title" aria-hidden="true">Vrolijk zijn in Gods tent!</p>`) {
+		t.Error("the title must show as a caption below the video")
 	}
 }
 
@@ -187,5 +193,26 @@ func TestRender_FirstPaintWaitsForTheWholeHeader(t *testing.T) {
 		if !strings.Contains(head, `<link rel="expect" href="#main" blocking="render">`) || !strings.Contains(html, `<main id="main">`) {
 			t.Errorf("%s: first paint does not wait for the header", p.Path)
 		}
+	}
+}
+
+// Lighthouse (user, 2026-10-03): a fixed 480 px flyer thumbnail was too big for desktop and too small for retina.
+func TestRender_FlyerThumbnailsLetTheBrowserPickASize(t *testing.T) {
+	html := render(t, sampleData(), "index.html")
+	want := `src="/media/m1-360.webp" srcset="/media/m1-360.webp 360w, /media/m1-720.webp 720w" sizes="(min-width: 72rem) 22rem, (min-width: 48rem) 30vw, 45vw"`
+	if !strings.Contains(html, want) {
+		t.Errorf("flyer thumbnail misses srcset/sizes: want %s", want)
+	}
+}
+
+// The video thumbnail is the largest element on desktop, so it loads first; logo and favicon carry a content
+// hash so they can be cached for a year.
+func TestRender_VideoThumbnailHasHighPriorityAndImagesAreVersioned(t *testing.T) {
+	html := render(t, sampleData(), "index.html")
+	if !regexp.MustCompile(`<img src="/media/yt-480\.webp"[^>]*fetchpriority="high"`).MatchString(html) {
+		t.Error("video thumbnail must have fetchpriority=high")
+	}
+	if n := len(regexp.MustCompile(`/static/img/logo\.svg\?v=[0-9a-f]{10}`).FindAllString(html, -1)); n != 2 {
+		t.Errorf("logo and favicon must use the versioned URL, found %d", n)
 	}
 }

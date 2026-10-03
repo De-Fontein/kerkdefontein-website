@@ -155,7 +155,7 @@ func TestRun_IdenticalFlyersConvertOnceButRenderTwice(t *testing.T) {
 	if _, err := Run(context.Background(), quiet, src, s, now); err != nil {
 		t.Fatal(err)
 	}
-	cached, err := os.ReadDir(filepath.Join(s.CacheDir, "flyers"))
+	cached, err := os.ReadDir(filepath.Join(s.CacheDir, flyerCache))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -246,5 +246,26 @@ func TestRun_EveryPageAndItsCSSFitTheFirstRoundTrip(t *testing.T) {
 	}
 	if len(pages)+len(nested1)+len(nested) < 12 {
 		t.Errorf("found only %d compressed pages", len(pages)+len(nested1)+len(nested))
+	}
+}
+
+// A conversion cached by an older binary (fewer sizes) must not be reused, or flyers miss their new sizes.
+func TestRun_ConvertsAgainWhenTheCacheIsFromAnOlderVersion(t *testing.T) {
+	src, s := setup(t, nil)
+	fx, _ := fake.Sample(now)
+	old := filepath.Join(s.CacheDir, "flyers", fx.Flyers[0].MD5)
+	if err := os.MkdirAll(old, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	stale := `{"Thumb":{"File":"x-480.webp","Width":480,"Height":679},"Large":{"File":"x-1600.webp","Width":800,"Height":1131}}`
+	if err := os.WriteFile(filepath.Join(old, "pair.json"), []byte(stale), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Run(context.Background(), quiet, src, s, now); err != nil {
+		t.Fatal(err)
+	}
+	home, _ := os.ReadFile(filepath.Join(s.SiteRoot, "current", "index.html"))
+	if strings.Contains(string(home), "x-480.webp") || !strings.Contains(string(home), "-720.webp 720w") {
+		t.Error("flyers must be converted again instead of reusing an older cache entry")
 	}
 }

@@ -59,7 +59,7 @@ func Sample(now time.Time) (Fixtures, error) {
 		sunday.AddDate(0, 0, 13).Format("2006-01-02"), sunday.AddDate(0, 0, 15).Format("2006-01-02"))
 
 	f.FeedXML = fmt.Sprintf(`<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns="http://www.w3.org/2005/Atom">
-	 <entry><yt:videoId>sample1</yt:videoId><title>Voorbeelddienst</title><published>%s</published></entry></feed>`,
+	 <entry><yt:videoId>sample1</yt:videoId><title>Voorbeelddienst over een lang onderwerp | Spreker | 04-10-2026</title><published>%s</published></entry></feed>`,
 		now.Add(-48*time.Hour).Format(time.RFC3339))
 	thumb, err := encodeJPEG(480, 360, colours[0])
 	if err != nil {

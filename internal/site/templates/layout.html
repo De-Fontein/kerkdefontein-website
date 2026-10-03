@@ -7,7 +7,7 @@
 <meta name="description" content="{{.Page.Description}}">
 <meta name="color-scheme" content="light dark">
 <link rel="canonical" href="{{.Data.BaseURL}}{{.Page.Path}}">
-<link rel="icon" href="/static/img/logo.svg" type="image/svg+xml">
+<link rel="icon" href="{{asset "img/logo.svg"}}" type="image/svg+xml">
 <script src="{{asset "js/theme.js"}}"></script>
 <link rel="stylesheet" href="{{asset "css/site.css"}}">
 <link rel="expect" href="#main" blocking="render">
@@ -29,6 +29,7 @@
 <main id="main">{{template "main" .}}</main>
 {{template "footer" .}}
 {{if eq .Page.Path "/"}}<script type="module" src="{{asset "js/youtube.js"}}"></script>{{end}}
+{{if eq .Page.Path "/activiteiten/"}}<script type="module" src="{{asset "js/activiteiten.js"}}"></script>{{end}}
 {{if eq .Page.Path "/doneren/"}}<script type="module" src="{{asset "js/giving.js"}}"></script>{{end}}
 </body>
 </html>{{end}}

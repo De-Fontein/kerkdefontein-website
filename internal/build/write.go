@@ -24,13 +24,13 @@ func writeSite(dir string, s Settings, p prepared, events []calendar.Event, now 
 	data := site.Data{BaseURL: s.BaseURL, CalendarICalURL: s.CalendarICalURL}
 
 	for _, f := range p.flyers {
-		for _, v := range []string{f.pair.Thumb.File, f.pair.Large.File} {
+		for _, v := range []string{f.set.Thumb.File, f.set.Thumb2x.File, f.set.Large.File} {
 			if err := copyFile(filepath.Join(f.fromDir, v), filepath.Join(dir, "media", v)); err != nil {
 				return err
 			}
 		}
 		data.Flyers = append(data.Flyers, site.FlyerView{ID: f.flyer.File.ID, Alt: f.flyer.Alt, Link: f.flyer.Link,
-			Thumb: f.pair.Thumb, Large: f.pair.Large})
+			Thumb: f.set.Thumb, Thumb2x: f.set.Thumb2x, Large: f.set.Large})
 	}
 	for _, d := range p.docs {
 		if !safeID.MatchString(d.doc.File.ID) {

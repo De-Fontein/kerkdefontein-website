@@ -58,6 +58,8 @@ h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0 0 1rem; }
 :root[data-js] .site-header { grid-template-columns: 1fr 2.75rem minmax(5.5rem, auto); grid-template-areas: "brand toggle nav"; }
 .site-header nav { grid-area: nav; justify-self: end; }
 .theme-toggle { grid-area: toggle; }
+/* Too narrow for the name beside the buttons (small phones, zoomed-in Safari): the logo alone, name for screen readers. */
+@media (max-width: 22.49rem) { .brand span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; } }
 .brand { grid-area: brand; justify-self: start; display: flex; align-items: center; gap: .5rem; font-weight: 700; color: var(--text); text-decoration: none; }
 /* Fixed width: the button keeps its place even if it is drawn before its label has arrived. */
 .menu-toggle { width: 5.5rem; }
@@ -117,8 +119,10 @@ h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0 0 1rem; }
 .video-facade { position: relative; width: 100%; height: 100%; padding: 0; border: 0; border-radius: var(--radius); overflow: hidden; background: #000; color: #fff; font: inherit; cursor: pointer; }
 .video-facade img { width: 100%; height: 100%; object-fit: cover; }
 /* Anchored at the top: a long title wraps downwards, so the label never moves as its text arrives. */
-.video-play { position: absolute; inset: 1rem 1rem auto 1rem; padding: .75rem 1rem; border-radius: .75rem; background: rgb(0 0 0 / .75); text-align: left; font-weight: 700; }
+.video-play { position: absolute; inset: .75rem auto auto .75rem; padding: .4rem .85rem; border-radius: 99px; background: rgb(0 0 0 / .75); text-align: left; font-weight: 700; }
 .video iframe { width: 100%; height: 100%; border: 0; border-radius: var(--radius); }
+/* Duplicate of the button's name for sighted users, so hidden from screen readers. */
+.video-title { font-weight: 700; margin: .75rem 0 0; }
 .video-note { color: var(--muted); font-size: .9rem; }
 
 .flyers { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; grid-template-columns: repeat(2, 1fr); }
@@ -151,7 +155,41 @@ h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0 0 1rem; }
 .giving-form iframe { display: block; width: 100%; height: min(42rem, 85svh); border: 1px solid var(--line); border-radius: var(--radius); background: #f2f3f7; }
 .giving-note { color: var(--muted); font-size: .9rem; }
 
-.toc { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; list-style: none; padding: 0; margin: 0 0 2rem; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+/* Activiteiten: one flat article (Safari Reader shows only one block otherwise) beside a grouped list that
+   follows along; on phones the list opens from a bar that stays at the top. */
+.act-nav, .act-nav ul { list-style: none; margin: 0; padding: 0; }
+.act-nav > li + li { margin-top: 1rem; }
+.nav-group-title, .act-group, .act-facts dt { font-size: .8rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.nav-group-title { display: block; margin-bottom: .25rem; }
+.act-nav a { display: block; padding: .35rem .75rem; margin-left: -.75rem; border-radius: .5rem; color: var(--text); text-decoration: none; }
+.act-nav a:hover { background: var(--surface); }
+.act-nav a[aria-current] { background: var(--surface); color: var(--accent); font-weight: 700; box-shadow: inset 3px 0 0 var(--accent); }
+.act-aside { position: sticky; top: 0; z-index: 2; }
+.act-bar { display: grid; grid-template-columns: 1fr 3rem; margin: 0 calc(-1 * var(--space)) 1rem; padding: 0 var(--space); border-bottom: 1px solid var(--line); background: var(--bg); }
+.act-jump { display: flex; align-items: center; gap: .5rem; min-height: 3rem; padding: 0; border: 0; background: none; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+.act-jump-label { color: var(--muted); }
+.act-current { flex: 1; font-weight: 700; }
+.act-top-icon { display: flex; align-items: center; justify-content: center; width: 3rem; margin-right: -.75rem; color: var(--text); font-size: 1.25rem; font-weight: 700; text-decoration: none; }
+.act-jump-list { inset: 4rem 1rem auto 1rem; margin: 0; max-height: 75vh; overflow: auto; padding: 1.25rem 1.5rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); color: var(--text); box-shadow: 0 1rem 3rem rgb(0 0 0 / .25); }
+.act-column { display: none; }
+.act-column-title { font-weight: 700; margin: 0 0 .75rem; }
+.act-top { margin: 1.5rem 0 0; padding-top: 1rem; border-top: 1px solid var(--line); }
+.act-top a { color: var(--accent); font-weight: 700; text-decoration: none; }
+.act-group { margin: 2.5rem 0 .25rem; padding-top: 2rem; border-top: 1px solid var(--line); }
+.act-group:first-child { margin-top: 0; padding-top: .5rem; border-top: 0; }
+.act-article h2 { margin: 0 0 1rem; scroll-margin-top: 4.5rem; }
+.act-facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: .75rem 1.5rem; margin: 0 0 1.5rem; padding: 1rem 1.25rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.act-facts dd { margin: .15rem 0 0; font-weight: 600; }
+@media (min-width: 60rem) {
+  .act-page { display: grid; grid-template-columns: 15rem 1fr; column-gap: 4rem; align-items: start; }
+  .act-page h1 { grid-column: 1 / -1; }
+  .act-aside { top: 1.5rem; }
+  .act-bar, .act-jump-list { display: none; }
+  .act-column { display: block; }
+  .act-article h2 { scroll-margin-top: 1.5rem; }
+}
 blockquote { margin: 1.5rem 0; padding-left: 1.25rem; border-left: 3px solid var(--line); font-style: italic; }
 .timeline dt { font-weight: 700; margin-top: 1.25rem; }
 .timeline dd { margin: .25rem 0 0; }

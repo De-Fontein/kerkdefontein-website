@@ -27,11 +27,11 @@ kerkdefontein.nl, nieuw.kerkdefontein.nl {
 		Permissions-Policy "camera=(), microphone=(), geolocation=()"
 		-Server
 	}
-	# Media names contain the content hash, and CSS/JS URLs carry ?v=<hash>, so none of them ever change.
+	# Media names contain the content hash, and asset URLs carry ?v=<hash>, so none of them ever change.
 	@media path /media/*
 	header @media Cache-Control "public, max-age=31536000, immutable"
 	@busted {
-		path /static/css/* /static/js/*
+		path /static/*
 		query v=*
 	}
 	header @busted Cache-Control "public, max-age=31536000, immutable"

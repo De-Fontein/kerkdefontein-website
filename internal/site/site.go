@@ -15,8 +15,8 @@ import (
 )
 
 type FlyerView struct {
-	ID, Alt, Link string
-	Thumb, Large  images.Variant
+	ID, Alt, Link         string
+	Thumb, Thumb2x, Large images.Variant
 }
 
 type VideoView struct {

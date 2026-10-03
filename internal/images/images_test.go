@@ -47,18 +47,23 @@ func TestConvert_PNGNeverUpscales(t *testing.T) {
 	src := filepath.Join(dir, "in.png")
 	writePNG(t, src, 800, 1131)
 
-	pair, err := Convert(context.Background(), src, "image/png", dir, "flyer")
+	set, err := Convert(context.Background(), src, "image/png", dir, "flyer")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if pair.Thumb != (Variant{File: "flyer-480.webp", Width: 480, Height: 679}) {
-		t.Errorf("thumb = %+v", pair.Thumb)
+	if set.Thumb != (Variant{File: "flyer-360.webp", Width: 360, Height: 509}) {
+		t.Errorf("thumb = %+v", set.Thumb)
 	}
-	if pair.Large != (Variant{File: "flyer-1600.webp", Width: 800, Height: 1131}) {
-		t.Errorf("large = %+v (must not upscale)", pair.Large)
+	if set.Thumb2x != (Variant{File: "flyer-720.webp", Width: 720, Height: 1018}) {
+		t.Errorf("thumb2x = %+v", set.Thumb2x)
 	}
-	if _, err := os.Stat(filepath.Join(dir, "flyer-480.webp")); err != nil {
-		t.Error(err)
+	if set.Large != (Variant{File: "flyer-1600.webp", Width: 800, Height: 1131}) {
+		t.Errorf("large = %+v (must not upscale)", set.Large)
+	}
+	for _, f := range []string{"flyer-360.webp", "flyer-720.webp", "flyer-1600.webp"} {
+		if _, err := os.Stat(filepath.Join(dir, f)); err != nil {
+			t.Error(err)
+		}
 	}
 }
 
@@ -70,12 +75,12 @@ func TestConvert_PDFUsesFirstPage(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	pair, err := Convert(context.Background(), src, "application/pdf", dir, "doc")
+	set, err := Convert(context.Background(), src, "application/pdf", dir, "doc")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if pair.Thumb.Width != 480 || pair.Thumb.Height <= pair.Thumb.Width {
-		t.Errorf("thumb = %+v, want portrait 480 wide", pair.Thumb)
+	if set.Thumb.Width != 360 || set.Thumb.Height <= set.Thumb.Width {
+		t.Errorf("thumb = %+v, want portrait 360 wide", set.Thumb)
 	}
 }
 

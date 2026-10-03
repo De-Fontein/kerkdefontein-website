@@ -186,3 +186,66 @@ test("every image reserves its space before it loads", async ({ page }) => {
     expect(unsized, path).toEqual([]);
   }
 });
+
+test("Activiteiten highlights the activity being read in the list", async ({ page }) => {
+  for (const width of [390, 1280]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto("/activiteiten/");
+    await page.evaluate(() => document.getElementById("kringen")!.scrollIntoView({ behavior: "instant" }));
+    await expect(page.locator(".act-nav a[aria-current]").filter({ visible: true })).toHaveText(width < 960 ? [] : ["Kringen"]);
+    if (width < 960) await expect(page.locator("[data-current]")).toHaveText("Kringen");
+  }
+});
+
+test("on phones Ga naar opens the grouped list and jumps to the chosen activity", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  await page.goto("/activiteiten/");
+  await page.getByRole("button", { name: /Ga naar/ }).click();
+  const list = page.locator("#act-jump-list");
+  await expect(list).toBeVisible();
+  await list.getByRole("link", { name: "Pastoraat", exact: true }).click();
+  await expect(list).toBeHidden();
+  await expect(page.locator("#pastoraat")).toBeInViewport();
+  await expect(page.locator("[data-current]")).toHaveText("Pastoraat");
+});
+
+test("Naar boven returns to the top of Activiteiten on phone and desktop", async ({ page }) => {
+  for (const width of [390, 1280]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto("/activiteiten/");
+    await page.evaluate(() => document.getElementById("pastoraat")!.scrollIntoView({ behavior: "instant" }));
+    await page.getByRole("link", { name: /Naar boven/ }).filter({ visible: true }).click();
+    await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
+  }
+});
+
+// Seen on an iPhone (user, 2026-10-03): at ~250 px the name ran under the theme button and a long video title
+// filled the thumbnail and was cut off. 250 px covers small phones and zoomed-in Safari.
+test("the header and video fit at every width from 250 px", async ({ page }) => {
+  for (const width of [250, 320, 390, 820, 1280]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto("/");
+    const brand = (await page.locator(".brand").boundingBox())!;
+    const toggle = (await page.locator(".theme-toggle").boundingBox())!;
+    expect(brand.x + brand.width, `brand overlaps the theme button at ${width}px`).toBeLessThanOrEqual(toggle.x);
+    expect(brand.height, `brand wraps at ${width}px`).toBeLessThanOrEqual(44);
+    const facade = (await page.locator(".video-facade").boundingBox())!;
+    const label = (await page.locator(".video-play").boundingBox())!;
+    expect(label.y + label.height, `play label is cut off at ${width}px`).toBeLessThanOrEqual(facade.y + facade.height);
+    expect(label.height, `play label covers the thumbnail at ${width}px`).toBeLessThanOrEqual(facade.height / 2.5);
+    await expect(page.getByText("Voorbeelddienst over een lang onderwerp | Spreker | 04-10-2026", { exact: true })).toBeVisible();
+  }
+});
+
+// Text pages share one centred reading column (user, 2026-10-03: Agenda sat to the left of the others).
+// Home and Activiteiten have their own wide layouts.
+test("text pages line up in the same centred column", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  const columns: Record<string, number> = {};
+  for (const path of allPages.filter((p) => p !== "/" && p !== "/activiteiten/")) {
+    await page.goto(path);
+    columns[path] = Math.round((await page.locator("main h1").boundingBox())!.x);
+  }
+  const reference = columns["/over-ons/"];
+  expect(Object.entries(columns).filter(([, x]) => x !== reference)).toEqual([]);
+});

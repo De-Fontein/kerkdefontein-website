@@ -1,6 +1,6 @@
 {{define "flyer"}}<li class="flyer">
   <button type="button" class="flyer-open" popovertarget="flyer-{{.ID}}" aria-label="Vergroot: {{.Alt}}">
-    <picture><img src="/media/{{.Thumb.File}}" alt="" width="{{.Thumb.Width}}" height="{{.Thumb.Height}}" loading="lazy" decoding="async"></picture>
+    <picture><img src="/media/{{.Thumb.File}}" srcset="/media/{{.Thumb.File}} 360w, /media/{{.Thumb2x.File}} 720w" sizes="(min-width: 72rem) 22rem, (min-width: 48rem) 30vw, 45vw" alt="" width="{{.Thumb.Width}}" height="{{.Thumb.Height}}" loading="lazy" decoding="async"></picture>
   </button>
   <div id="flyer-{{.ID}}" class="flyer-popover" popover>
     <picture><img src="/media/{{.Large.File}}" alt="{{.Alt}}" width="{{.Large.Width}}" height="{{.Large.Height}}" loading="lazy" decoding="async"></picture>

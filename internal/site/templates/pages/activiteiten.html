@@ -1,98 +1,133 @@
-{{define "main"}}<div class="page prose">
+{{define "act-nav"}}<ul class="act-nav">
+    <li><span class="nav-group-title">Kinderen en jeugd</span>
+      <ul>
+        <li><a href="#kinderen">Kinderen</a></li>
+        <li><a href="#tieners-en-jeugd">Tieners en jeugd</a></li>
+        <li><a href="#jong-volwassenen">Jong volwassenen</a></li>
+        <li><a href="#kjp">Kinder- en Jeugd Pastoraat</a></li>
+      </ul>
+    </li>
+    <li><span class="nav-group-title">Samen groeien</span>
+      <ul>
+        <li><a href="#bijbelstudies">Bijbelstudies</a></li>
+        <li><a href="#kringen">Kringen</a></li>
+        <li><a href="#vrouwen">Vrouwen</a></li>
+      </ul>
+    </li>
+    <li><span class="nav-group-title">Gebed, evangelisatie en zorg</span>
+      <ul>
+        <li><a href="#bidstonden">Bidstonden</a></li>
+        <li><a href="#evangelisatie">Evangelisatie</a></li>
+        <li><a href="#pastoraat">Pastoraat</a></li>
+      </ul>
+    </li>
+  </ul>{{end}}
+{{define "main"}}<div class="page act-page">
   <h1>Activiteiten</h1>
-  <nav aria-label="Op deze pagina">
-    <ul class="toc">
-      <li><a href="#bijbelstudies">Bijbelstudies</a></li>
-      <li><a href="#kinderen">Kinderen</a></li>
-      <li><a href="#tieners-en-jeugd">Tieners en jeugd</a></li>
-      <li><a href="#jong-volwassenen">Jong volwassenen</a></li>
-      <li><a href="#kringen">Kringen</a></li>
-      <li><a href="#vrouwen">Vrouwen</a></li>
-      <li><a href="#bidstonden">Bidstonden</a></li>
-      <li><a href="#evangelisatie">Evangelisatie</a></li>
-      <li><a href="#pastoraat">Pastoraat</a></li>
-      <li><a href="#kjp">Kinder- en Jeugd Pastoraat</a></li>
-    </ul>
+  <nav class="act-aside" aria-label="Activiteiten">
+    <div class="act-bar">
+      <button type="button" class="act-jump" popovertarget="act-jump-list"><span class="act-jump-label">Ga naar</span> <span class="act-current" data-current>Kinderen</span> <span aria-hidden="true">▾</span></button>
+      <a class="act-top-icon" href="#top" aria-label="Naar boven"><span aria-hidden="true">↑</span></a>
+    </div>
+    <div id="act-jump-list" class="act-jump-list" popover>{{template "act-nav"}}</div>
+    <div class="act-column">
+      <p class="act-column-title">Op deze pagina</p>
+      {{template "act-nav"}}
+      <p class="act-top"><a href="#top">↑ Naar boven</a></p>
+    </div>
   </nav>
-
-  <h2 id="bijbelstudies">Bijbelstudies</h2>
-  <p>U bent van harte welkom, ook als u niet betrokken bent bij de gemeente.</p>
-  <p>U kunt (eerdere) studies volgen op ons <a href="https://www.youtube.com/@defonteinmiddelburg">YouTube kanaal</a>.</p>
-
-  <h2 id="kinderen">Kinderen</h2>
-  <p>Kinderen zijn welkom in onze gemeente! Ook nieuwe kinderen, gasten, vriendjes en vriendinnetjes zijn van harte welkom.</p>
-  <p>We willen ouders ondersteunen in hun geestelijke taak door elk kind een veilige, avontuurlijke plek te bieden, waar het Jezus leert kennen, meer op Hem gaat lijken en zijn liefde leert delen!</p>
-  <p>De kinderen komen met hun ouders naar de dienst en na het kinderblok gaan ze naar hun eigen lokaal. De kinderen worden ingedeeld naar de leeftijdsgroepen van de basisschool:</p>
-  <ul>
+  <!-- One flat article: Safari's Reader View shows only one block when activities are wrapped separately. -->
+  <article class="act-article prose">
+    <p class="act-group">Kinderen en jeugd</p>
+    <h2 id="kinderen">Kinderen</h2>
+    <dl class="act-facts"><div><dt>Wanneer</dt><dd>Zondag, tijdens de dienst</dd></div><div><dt>Voor wie</dt><dd>0–12 jaar</dd></div></dl>
+    <p>Kinderen zijn welkom in onze gemeente! Ook nieuwe kinderen, gasten, vriendjes en vriendinnetjes zijn van harte welkom.</p>
+    <p>We willen ouders ondersteunen in hun geestelijke taak door elk kind een veilige, avontuurlijke plek te bieden, waar het Jezus leert kennen, meer op Hem gaat lijken en zijn liefde leert delen!</p>
+    <p>De kinderen komen met hun ouders naar de dienst en na het kinderblok gaan ze naar hun eigen lokaal. De kinderen worden ingedeeld naar de leeftijdsgroepen van de basisschool:</p>
+    <ul>
     <li>0 – 4 jaar crèche</li>
     <li>groep 1 – 2</li>
     <li>groep 3 – 4</li>
     <li>groep 5 – 6</li>
     <li>groep 7 – 8</li>
-  </ul>
-  <p>Op de tweede zondag van de maand is er Kidstime i.p.v. zondagsschool. De Kidstime start direct om 10:00 uur.</p>
-
-  <h2 id="tieners-en-jeugd">Tieners en jeugd</h2>
-  <p>De wereld staat voor je open, jij kunt alle kanten op. Als gemeente willen we graag een thuis voor je zijn. Een plek waar je welkom bent, waar we in je geloven, omdat we in Jezus geloven. Hier word je aangemoedigd om het avontuur niet alleen aan te gaan, maar samen met jouw hemelse Vader en broers en zussen om je heen. Hier leeft het geloof in Zijn genade voor jou. Dit is de plek van een nieuwe generatie. Jouw generatie.</p>
-  <p>Om de week op vrijdagavond (zie <a href="/agenda/">agenda</a>) is er ‘jeugd’ in het gebouw van onze gemeente van 19.00 – 21.00 uur voor tieners en jongeren in de middelbare schoolleeftijd van 12-18 jaar (ingang zijdeur)</p>
-  <p>Om een mooi programma samen te stellen voor onze tieners en jongeren, kunnen we putten uit divers materiaal, zoals: Onweerstaanbaar van Raise Up, Jeugdwerk met LEV, Reflect van Mark Stoorvogel en o.a. zelfgemaakte studies. Zo kunnen we maatwerk leveren aan de groep die er op dat moment is. Identiteit in Christus komt elk jaar terug omdat dit echt een basis is die herhaling vraagt voor ons allemaal.</p>
-  <p>De studies worden afgewisseld met ontspanningsavonden, waarbij we bijvoorbeeld een film kijken of sport en spel doen in een gymzaal in de buurt. Ook hebben we in principe elk jaar een kamp waarbij we een nacht slapen in een kamphuis in de buurt. De kampen hebben elk jaar een speciaal thema.</p>
-  <h3>Jong en oud</h3>
-  <p>Om de verbinding met de hele gemeente sterker te maken, worden avonden georganiseerd waarop gemeenteleden en tieners iets met elkaar kunnen delen over hun leven met God ter bemoediging van elkaar. Ook investeren gemeenteleden in de tieners en jongeren door voor hen klaar te staan als gebedsmaatje.</p>
-
-  <h2 id="jong-volwassenen">Jong volwassenen</h2>
-  <p>De kring ‘Jong volwassenen’ is voor iedereen in de leeftijd van 18-21+ jaar om samen met leeftijdsgenoten verdieping te zoeken in de Bijbel. Het zijn avonden waarin je van elkaar kunt leren, elkaar kunt bemoedigen en elkaar aan kunt scherpen in geloof.</p>
-  <p>Voorbeelden van thema’s die besproken kunnen worden:</p>
-  <ul>
+    </ul>
+    <p>Op de tweede zondag van de maand is er Kidstime i.p.v. zondagsschool. De Kidstime start direct om 10:00 uur.</p>
+    <p class="act-group">Kinderen en jeugd</p>
+    <h2 id="tieners-en-jeugd">Tieners en jeugd</h2>
+    <dl class="act-facts"><div><dt>Wanneer</dt><dd>Om de week vrijdag, 19.00–21.00</dd></div><div><dt>Voor wie</dt><dd>12–18 jaar</dd></div><div><dt>Waar</dt><dd>De Hoeksteen, ingang zijdeur</dd></div></dl>
+    <p>De wereld staat voor je open, jij kunt alle kanten op. Als gemeente willen we graag een thuis voor je zijn. Een plek waar je welkom bent, waar we in je geloven, omdat we in Jezus geloven. Hier word je aangemoedigd om het avontuur niet alleen aan te gaan, maar samen met jouw hemelse Vader en broers en zussen om je heen. Hier leeft het geloof in Zijn genade voor jou. Dit is de plek van een nieuwe generatie. Jouw generatie.</p>
+    <p>Om de week op vrijdagavond (zie <a href="/agenda/">agenda</a>) is er ‘jeugd’ in het gebouw van onze gemeente van 19.00 – 21.00 uur voor tieners en jongeren in de middelbare schoolleeftijd van 12-18 jaar (ingang zijdeur)</p>
+    <p>Om een mooi programma samen te stellen voor onze tieners en jongeren, kunnen we putten uit divers materiaal, zoals: Onweerstaanbaar van Raise Up, Jeugdwerk met LEV, Reflect van Mark Stoorvogel en o.a. zelfgemaakte studies. Zo kunnen we maatwerk leveren aan de groep die er op dat moment is. Identiteit in Christus komt elk jaar terug omdat dit echt een basis is die herhaling vraagt voor ons allemaal.</p>
+    <p>De studies worden afgewisseld met ontspanningsavonden, waarbij we bijvoorbeeld een film kijken of sport en spel doen in een gymzaal in de buurt. Ook hebben we in principe elk jaar een kamp waarbij we een nacht slapen in een kamphuis in de buurt. De kampen hebben elk jaar een speciaal thema.</p>
+    <h3>Jong en oud</h3>
+    <p>Om de verbinding met de hele gemeente sterker te maken, worden avonden georganiseerd waarop gemeenteleden en tieners iets met elkaar kunnen delen over hun leven met God ter bemoediging van elkaar. Ook investeren gemeenteleden in de tieners en jongeren door voor hen klaar te staan als gebedsmaatje.</p>
+    <p class="act-group">Kinderen en jeugd</p>
+    <h2 id="jong-volwassenen">Jong volwassenen</h2>
+    <dl class="act-facts"><div><dt>Wanneer</dt><dd>Laatste vrijdag van de maand, 18.00–22.00</dd></div><div><dt>Voor wie</dt><dd>18–21+ jaar</dd></div></dl>
+    <p>De kring ‘Jong volwassenen’ is voor iedereen in de leeftijd van 18-21+ jaar om samen met leeftijdsgenoten verdieping te zoeken in de Bijbel. Het zijn avonden waarin je van elkaar kunt leren, elkaar kunt bemoedigen en elkaar aan kunt scherpen in geloof.</p>
+    <p>Voorbeelden van thema’s die besproken kunnen worden:</p>
+    <ul>
     <li>Schepping of evolutie?</li>
     <li>Dat wat komen gaat…?!</li>
     <li>Waar komen we vandaan, wat doen we hier en waar gaan we heen?</li>
     <li>Wie is Jezus Christus?</li>
     <li>Wat is wijsheid en wat is waarheid?</li>
     <li>Huwelijk en samenwonen? Etc. etc.</li>
-  </ul>
-  <p>Wil je graag samen met leeftijdsgenoten de Bijbel bestuderen en je geloof opbouwen? Dan nodigen we je hierbij van harte uit op de laatste vrijdagavond van de maand van 18.00 – 22.00 uur.</p>
-  <p>* We beginnen met een maaltijd! Super gezellig en erg lekker!</p>
-
-  <h2 id="kringen">Kringen</h2>
-  <h3>Een gemeente van kringen</h3>
-  <p>Geloven doe je niet alleen. Daarvoor heb je elkaar nodig.</p>
-  <p>Samen groeien en delen is een belangrijk onderdeel van het leven als christen. Daarom is de Fontein een gemeente van kringen. Leden en betrokkenen zijn welkom op een kring.</p>
-  <p>Zo verschillend als mensen zijn, zo verschillend zijn ook onze kringen. Van bijbelstudiekring tot Crea-kring, van ‘gewone’ huiskring tot Vrouwenkring. Ook is er een speciale ouderenkring. Voor elk wat wils!</p>
-  <p>Het streven is dat er voor iedereen een kring is waar hij of zij aansluiting kan vinden. Kringen bepalen zelf wanneer ze bij elkaar komen en ook de frequentie van hun samenkomsten.</p>
-  <p>Het doel van een huiskring is om samen te groeien: dichter naar elkaar, maar ook dichter naar God.</p>
-
-  <h2 id="vrouwen">Vrouwen</h2>
-  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-  <p>Zie de <a href="/agenda/">agenda</a> voor de data.</p>
-
-  <h2 id="bidstonden">Bidstonden</h2>
-  <p>Iedere maandagmorgen om 7.00 uur is er een gemeentebidstond.</p>
-  <p>Iedere donderdagavond is er ook een bidstond. We bidden ook voor de gemeente, Israel, de wereld en voor elkaars noden.</p>
-  <p>Van harte aanbevolen!</p>
-
-  <h2 id="evangelisatie">Evangelisatie</h2>
-  <p>Veel mensen zijn op zoek naar wie God werkelijk is.</p>
-  <p>We willen Gods liefde uitdelen en gaan elke 3de donderdag van de maand op stap.</p>
-  <p>Wilt u meedoen of meer weten? <a href="mailto:info@kerkdefontein.nl">info@kerkdefontein.nl</a></p>
-
-  <h2 id="pastoraat">Pastoraat</h2>
-  <h3>Omzien naar elkaar</h3>
-  <p>Als leden van onze gemeente De Fontein zijn we betrokken bij elkaar en bij anderen die we ontmoeten en een beroep op ons doen. We proberen met elkaar mee te leven en open te staan voor elkaars verhaal. Dit gebeurt bijvoorbeeld ook in de kringen. Door te luisteren en waar mogelijk raad te geven, willen we elkaar helpen om weer met vreugde te kunnen leven als christen in de gemeente, thuis en op het werk.</p>
-  <h3>Maar soms is er meer nodig.</h3>
-  <p>Soms is er meer nodig en heb je behoefte aan meer professionele hulp. In de eerste plaats is er ons pastorale team waar u een beroep op kunt doen. U kunt hen altijd uitnodigen voor een gesprek. Zij willen een luisterend oor voor u zijn en waar mogelijk, geestelijke bijstand, raad en praktische hulp bieden. Zij doen dit in het vertrouwen dat God boven bidden en denken gebeden verhoort en dat mensen ondanks de zorgen en moeiten die er zijn, de blijdschap van de Heer mogen ervaren in hun dagelijks leven.</p>
-  <p>Waar nodig zal het pastoraal team doorverwijzen naar professionele hulpverleningsinstanties in de regio.</p>
-  <p>Wij geloven dat wij uit eigen kracht niet in staat zijn complexe pastorale problemen op te lossen. Het is de Heilige Geest die daarvoor Zijn gaven geeft. Wanneer wij ons toewijden aan het toepassen van Bijbelse principes, zal de Heilige Geest Zijn kracht schenken om te bevrijden, te genezen en te vernieuwen, zelfs daar waar geen hoop meer lijkt te zijn.</p>
-  <p>Wil je meer weten, heb je vragen of heb je behoefte aan contact? Mail naar: <a href="mailto:pastoraat@kerkdefontein.nl">pastoraat@kerkdefontein.nl</a></p>
-
-  <h2 id="kjp">Kinder- en Jeugd Pastoraat</h2>
-  <p>Kinder- en Jeugd Pastoraat is de zorg voor kinderen, tieners en jongeren van de gemeente.</p>
-  <h3>Gemeente zijn en de jeugd</h3>
-  <p>Ieder gemeentelid heeft de opdracht en verantwoordelijkheid om naar de andere gemeenteleden om te zien, met name ook naar de kinderen en jongeren, zodat zij zich binnen de gemeente veilig en prettig voelen. Door met hen in gesprek te gaan zullen zij zich gewaardeerd voelen en door het contact groeit ook de onderlinge verbondenheid.</p>
-  <p>Maar soms is er meer nodig. En dan is er het KJP, dat staat voor Kinder- en Jeugd Pastoraat.</p>
-  <p>Het KJP kan helpen met het begeleiden en eventueel herstellen van de gezonde ontwikkelingsmogelijkheden van het kind/ de jongere in de gemeente waardoor het de kans krijgt op te groeien tot een volwassene die leeft tot eer van God en in goede relatie met anderen.</p>
-  <p>Je kunt een beroep doen op het KJP als je met vragen rondloopt. Dat kunnen allerlei vragen zijn, over school, werk, geloof, God, thuis, relaties, pesten, verdriet, echtscheiding, angsten, niet goed in je vel zitten, misbruik, verslaving, negatief zelfbeeld, eetproblemen… Over alles eigenlijk. Misschien heb je iets bijzonders ervaren dat je met iemand wilt delen.</p>
-  <p>Soms zijn er problemen in je omgeving waar je zelf niet uitkomt...Kom er dan mee! Mensen van het KJP kunnen je helpen, door naar je te luisteren en er voor je te zijn. Dit geldt ook voor ouders, soms is het fijn om te praten over opvoeden en om ervaringen te delen.</p>
-  <p>We willen als KJP ook graag behulpzaam zijn in tijden van overlijden en rouw.</p>
-  <p><a href="mailto:kjp@kerkdefontein.nl">kjp@kerkdefontein.nl</a></p>
+    </ul>
+    <p>Wil je graag samen met leeftijdsgenoten de Bijbel bestuderen en je geloof opbouwen? Dan nodigen we je hierbij van harte uit op de laatste vrijdagavond van de maand van 18.00 – 22.00 uur.</p>
+    <p>* We beginnen met een maaltijd! Super gezellig en erg lekker!</p>
+    <p class="act-group">Kinderen en jeugd</p>
+    <h2 id="kjp">Kinder- en Jeugd Pastoraat</h2>
+    <dl class="act-facts"><div><dt>Wanneer</dt><dd>Op afspraak</dd></div><div><dt>Voor wie</dt><dd>Kinderen, tieners, jongeren en ouders</dd></div><div><dt>Contact</dt><dd><a href="mailto:kjp@kerkdefontein.nl">kjp@kerkdefontein.nl</a></dd></div></dl>
+    <p>Kinder- en Jeugd Pastoraat is de zorg voor kinderen, tieners en jongeren van de gemeente.</p>
+    <h3>Gemeente zijn en de jeugd</h3>
+    <p>Ieder gemeentelid heeft de opdracht en verantwoordelijkheid om naar de andere gemeenteleden om te zien, met name ook naar de kinderen en jongeren, zodat zij zich binnen de gemeente veilig en prettig voelen. Door met hen in gesprek te gaan zullen zij zich gewaardeerd voelen en door het contact groeit ook de onderlinge verbondenheid.</p>
+    <p>Maar soms is er meer nodig. En dan is er het KJP, dat staat voor Kinder- en Jeugd Pastoraat.</p>
+    <p>Het KJP kan helpen met het begeleiden en eventueel herstellen van de gezonde ontwikkelingsmogelijkheden van het kind/ de jongere in de gemeente waardoor het de kans krijgt op te groeien tot een volwassene die leeft tot eer van God en in goede relatie met anderen.</p>
+    <p>Je kunt een beroep doen op het KJP als je met vragen rondloopt. Dat kunnen allerlei vragen zijn, over school, werk, geloof, God, thuis, relaties, pesten, verdriet, echtscheiding, angsten, niet goed in je vel zitten, misbruik, verslaving, negatief zelfbeeld, eetproblemen… Over alles eigenlijk. Misschien heb je iets bijzonders ervaren dat je met iemand wilt delen.</p>
+    <p>Soms zijn er problemen in je omgeving waar je zelf niet uitkomt...Kom er dan mee! Mensen van het KJP kunnen je helpen, door naar je te luisteren en er voor je te zijn. Dit geldt ook voor ouders, soms is het fijn om te praten over opvoeden en om ervaringen te delen.</p>
+    <p>We willen als KJP ook graag behulpzaam zijn in tijden van overlijden en rouw.</p>
+    <p><a href="mailto:kjp@kerkdefontein.nl">kjp@kerkdefontein.nl</a></p>
+    <p class="act-group">Samen groeien</p>
+    <h2 id="bijbelstudies">Bijbelstudies</h2>
+    <dl class="act-facts"><div><dt>Wanneer</dt><dd>Zie de <a href="/agenda/">agenda</a></dd></div><div><dt>Voor wie</dt><dd>Iedereen</dd></div></dl>
+    <p>U bent van harte welkom, ook als u niet betrokken bent bij de gemeente.</p>
+    <p>U kunt (eerdere) studies volgen op ons <a href="https://www.youtube.com/@defonteinmiddelburg">YouTube kanaal</a>.</p>
+    <p class="act-group">Samen groeien</p>
+    <h2 id="kringen">Kringen</h2>
+    <dl class="act-facts"><div><dt>Wanneer</dt><dd>Door de week, per kring verschillend</dd></div><div><dt>Voor wie</dt><dd>Leden en betrokkenen</dd></div></dl>
+    <h3>Een gemeente van kringen</h3>
+    <p>Geloven doe je niet alleen. Daarvoor heb je elkaar nodig.</p>
+    <p>Samen groeien en delen is een belangrijk onderdeel van het leven als christen. Daarom is de Fontein een gemeente van kringen. Leden en betrokkenen zijn welkom op een kring.</p>
+    <p>Zo verschillend als mensen zijn, zo verschillend zijn ook onze kringen. Van bijbelstudiekring tot Crea-kring, van ‘gewone’ huiskring tot Vrouwenkring. Ook is er een speciale ouderenkring. Voor elk wat wils!</p>
+    <p>Het streven is dat er voor iedereen een kring is waar hij of zij aansluiting kan vinden. Kringen bepalen zelf wanneer ze bij elkaar komen en ook de frequentie van hun samenkomsten.</p>
+    <p>Het doel van een huiskring is om samen te groeien: dichter naar elkaar, maar ook dichter naar God.</p>
+    <p class="act-group">Samen groeien</p>
+    <h2 id="vrouwen">Vrouwen</h2>
+    <dl class="act-facts"><div><dt>Wanneer</dt><dd>Zie de <a href="/agenda/">agenda</a></dd></div><div><dt>Voor wie</dt><dd>Vrouwen</dd></div></dl>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+    <p>Zie de <a href="/agenda/">agenda</a> voor de data.</p>
+    <p class="act-group">Gebed, evangelisatie en zorg</p>
+    <h2 id="bidstonden">Bidstonden</h2>
+    <dl class="act-facts"><div><dt>Wanneer</dt><dd>Maandag 7.00 · donderdagavond</dd></div><div><dt>Voor wie</dt><dd>Iedereen</dd></div></dl>
+    <p>Iedere maandagmorgen om 7.00 uur is er een gemeentebidstond.</p>
+    <p>Iedere donderdagavond is er ook een bidstond. We bidden ook voor de gemeente, Israel, de wereld en voor elkaars noden.</p>
+    <p>Van harte aanbevolen!</p>
+    <p class="act-group">Gebed, evangelisatie en zorg</p>
+    <h2 id="evangelisatie">Evangelisatie</h2>
+    <dl class="act-facts"><div><dt>Wanneer</dt><dd>Elke 3e donderdag van de maand</dd></div><div><dt>Contact</dt><dd><a href="mailto:info@kerkdefontein.nl">info@kerkdefontein.nl</a></dd></div></dl>
+    <p>Veel mensen zijn op zoek naar wie God werkelijk is.</p>
+    <p>We willen Gods liefde uitdelen en gaan elke 3de donderdag van de maand op stap.</p>
+    <p>Wilt u meedoen of meer weten? <a href="mailto:info@kerkdefontein.nl">info@kerkdefontein.nl</a></p>
+    <p class="act-group">Gebed, evangelisatie en zorg</p>
+    <h2 id="pastoraat">Pastoraat</h2>
+    <dl class="act-facts"><div><dt>Wanneer</dt><dd>Op afspraak</dd></div><div><dt>Contact</dt><dd><a href="mailto:pastoraat@kerkdefontein.nl">pastoraat@kerkdefontein.nl</a></dd></div></dl>
+    <h3>Omzien naar elkaar</h3>
+    <p>Als leden van onze gemeente De Fontein zijn we betrokken bij elkaar en bij anderen die we ontmoeten en een beroep op ons doen. We proberen met elkaar mee te leven en open te staan voor elkaars verhaal. Dit gebeurt bijvoorbeeld ook in de kringen. Door te luisteren en waar mogelijk raad te geven, willen we elkaar helpen om weer met vreugde te kunnen leven als christen in de gemeente, thuis en op het werk.</p>
+    <h3>Maar soms is er meer nodig.</h3>
+    <p>Soms is er meer nodig en heb je behoefte aan meer professionele hulp. In de eerste plaats is er ons pastorale team waar u een beroep op kunt doen. U kunt hen altijd uitnodigen voor een gesprek. Zij willen een luisterend oor voor u zijn en waar mogelijk, geestelijke bijstand, raad en praktische hulp bieden. Zij doen dit in het vertrouwen dat God boven bidden en denken gebeden verhoort en dat mensen ondanks de zorgen en moeiten die er zijn, de blijdschap van de Heer mogen ervaren in hun dagelijks leven.</p>
+    <p>Waar nodig zal het pastoraal team doorverwijzen naar professionele hulpverleningsinstanties in de regio.</p>
+    <p>Wij geloven dat wij uit eigen kracht niet in staat zijn complexe pastorale problemen op te lossen. Het is de Heilige Geest die daarvoor Zijn gaven geeft. Wanneer wij ons toewijden aan het toepassen van Bijbelse principes, zal de Heilige Geest Zijn kracht schenken om te bevrijden, te genezen en te vernieuwen, zelfs daar waar geen hoop meer lijkt te zijn.</p>
+    <p>Wil je meer weten, heb je vragen of heb je behoefte aan contact? Mail naar: <a href="mailto:pastoraat@kerkdefontein.nl">pastoraat@kerkdefontein.nl</a></p>
+  </article>
 </div>{{end}}

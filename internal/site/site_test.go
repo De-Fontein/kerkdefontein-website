@@ -167,3 +167,16 @@ func TestRender_AssetURLsCarryAContentHash(t *testing.T) {
 		}
 	}
 }
+
+// The theme menu is native HTML: a popover opened by the button, holding one radio group.
+func TestRender_ThemeMenuIsANativePopoverWithFourChoices(t *testing.T) {
+	html := render(t, sampleData(), "index.html")
+	if !strings.Contains(html, `popovertarget="theme-menu"`) || !strings.Contains(html, `id="theme-menu" class="theme-menu" popover`) {
+		t.Error("theme button must open the #theme-menu popover")
+	}
+	for _, value := range []string{"auto", "light", "dark", "oled"} {
+		if !strings.Contains(html, `<input type="radio" name="theme" value="`+value+`"`) {
+			t.Errorf("theme menu misses the %s option", value)
+		}
+	}
+}

@@ -73,7 +73,7 @@ The site and email move separately. Moving the domain and the 50 mailboxes (abou
 | `/` | Hero, latest service video, flyers ("Actueel"), next 3 agenda items, giving teaser |
 | `/eerste-keer/` | First visit. **Placeholder (lorem ipsum) until the church supplies the text** |
 | `/samenkomsten/` | Sunday services, Avondmaal, Dopen, Opdragen |
-| `/activiteiten/` | Table of contents, then one section per activity (anchors such as `#vrouwen` are linked from flyers). Vrouwen is a **placeholder** |
+| `/activiteiten/` | Grouped list beside one flat article; facts (Wanneer / Voor wie / Contact) per activity. Anchors such as `#vrouwen` are linked from flyers. Vrouwen is a **placeholder** |
 | `/agenda/` | All upcoming events, an `.ics` download per event, a subscribe link, the nieuwsflits archive |
 | `/over-ons/` | Wie zijn wij, Waar staan we voor, Missie, Waarden, and links to the two pages below |
 | `/over-ons/israel/` | Israël text, with a link to christenenvoorisrael.nl |
@@ -122,6 +122,10 @@ The site and email move separately. Moving the domain and the 50 mailboxes (abou
 | 2026-10-03 | Israël page: link to Christenen voor Israël, without embedding their videos |
 | 2026-10-03 | Link the church's privacy statement (PDF) from `/privacy/` |
 | 2026-10-03 | No layout shift is a hard requirement, tested on every page at 4 widths in 4 browsers |
+| 2026-10-03 | Activiteiten: two columns, grouped list that follows along, one flat article (Safari Reader View) |
+| 2026-10-03 | Enlarged flyers: ‹ / › buttons, arrow keys and swipes; no auto-rotating carousel (missed content, WCAG 2.2.2) |
+| 2026-10-03 | Route plannen opens the visitor's own maps app (Apple Maps, Android's choice), OpenStreetMap otherwise |
+| 2026-10-03 | Keep render-blocking CSS and theme script: inlining costs CSP hashes per deploy; LCP is ~0.5 s on slow 4G |
 
 ## Open items
 

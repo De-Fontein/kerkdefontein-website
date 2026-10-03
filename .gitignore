@@ -1,2 +1,10 @@
+/dist/
+/out/
+/node_modules/
+/web/static/js/
+/test-results/
+/playwright-report/
+/.lighthouseci/
 /.superpowers/
+/.playwright-mcp/
 /docs/superpowers/

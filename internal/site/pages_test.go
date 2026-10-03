@@ -1,6 +1,7 @@
 package site
 
 import (
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -71,5 +72,30 @@ func TestRender_DonerenHasANBIDataAndDocuments(t *testing.T) {
 		if !strings.Contains(html, want) {
 			t.Errorf("doneren misses %s", want)
 		}
+	}
+}
+
+// The repository is public and git keeps history: only the elders and role addresses may appear (user, 2026-10-03).
+func TestRender_NoPersonalContactDetails(t *testing.T) {
+	phone := regexp.MustCompile(`\b0\d{1,3}[- ]?\d{6,8}\b`)
+	mailto := regexp.MustCompile(`mailto:([^"]+)`)
+	allowed := map[string]bool{"info@kerkdefontein.nl": true, "verhuur@hoeksteenmiddelburg.nl": true}
+	for _, p := range Pages {
+		html := render(t, sampleData(), outputPath("", p.Path))
+		if m := phone.FindString(html); m != "" {
+			t.Errorf("%s contains phone number %q", p.Path, m)
+		}
+		for _, m := range mailto.FindAllStringSubmatch(html, -1) {
+			if !allowed[m[1]] {
+				t.Errorf("%s links to personal address %q", p.Path, m[1])
+			}
+		}
+	}
+}
+
+func TestRender_AgendaLinksTheNewsletterArchive(t *testing.T) {
+	html := render(t, sampleData(), "agenda/index.html")
+	if !strings.Contains(html, `href="https://us10.campaign-archive.com/home/?u=d7a8cec352a291f1f6358cffb&amp;id=68a3c61809"`) {
+		t.Error("agenda misses the nieuwsflits archive link")
 	}
 }

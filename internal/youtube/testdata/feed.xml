@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/" xmlns="http://www.w3.org/2005/Atom">
+ <title>Baptistengemeente de Fontein</title>
+ <published>2023-05-02T12:24:09+00:00</published>
+ <entry>
+  <yt:videoId>nHwtUadh2sM</yt:videoId>
+  <title>David: man naar Gods hart (1) | Leander Janse | 1 Sam. 16:1-13 |  27-09-2026</title>
+  <published>2026-09-27T22:07:05+00:00</published>
+  <media:group><media:title>ignored nested title</media:title></media:group>
+ </entry>
+ <entry>
+  <yt:videoId>qeWRxvxJvNs</yt:videoId>
+  <title>Vrolijk zijn in Gods tent! | Leander Janse | 04-10-2026</title>
+  <published>2026-09-30T19:13:02+00:00</published>
+ </entry>
+ <entry>
+  <yt:videoId>wzd3hl6dYYw</yt:videoId>
+  <title>Deel 1 | Bijbelstudie | Volhouden in beproeving | Jak. 1:1-19 | Leander Janse | 23-09-2026</title>
+  <published>2026-09-24T08:06:55+00:00</published>
+ </entry>
+</feed>

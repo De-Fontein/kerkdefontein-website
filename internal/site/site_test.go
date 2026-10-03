@@ -2,6 +2,7 @@ package site
 
 import (
 	"os"
+	"regexp"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -143,7 +144,7 @@ func TestRender_ThemeToggleAndBlockingScriptInHead(t *testing.T) {
 	if !strings.Contains(head, `<script src="/static/js/theme.js"></script>`) {
 		t.Error("head must load theme.js as a plain blocking script")
 	}
-	if !strings.Contains(html, `<button type="button" class="theme-toggle" data-theme-toggle hidden`) {
+	if !regexp.MustCompile(`<button[^>]*\bdata-theme-toggle\b[^>]*\shidden[\s>]`).MatchString(html) {
 		t.Error("theme toggle must start hidden, so it never shows without JavaScript")
 	}
 }

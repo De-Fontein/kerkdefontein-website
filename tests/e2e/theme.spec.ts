@@ -66,3 +66,16 @@ test("the toggle sits after the links on desktop and left of Menu on phones", as
   const menu = page.getByRole("button", { name: "Menu" });
   expect((await toggle.boundingBox())!.x).toBeLessThan((await menu.boundingBox())!.x);
 });
+
+test("the theme icon is centred in its button in every state", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  const toggle = page.locator("[data-theme-toggle]");
+  for (let i = 0; i < 3; i++) {
+    const button = (await toggle.boundingBox())!;
+    const icon = (await toggle.locator("svg:visible").boundingBox())!;
+    expect(Math.abs(icon.x + icon.width / 2 - (button.x + button.width / 2))).toBeLessThanOrEqual(0.5);
+    expect(Math.abs(icon.y + icon.height / 2 - (button.y + button.height / 2))).toBeLessThanOrEqual(0.5);
+    await toggle.click();
+  }
+});

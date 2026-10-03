@@ -51,7 +51,10 @@ h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0 0 1rem; }
 .menu li + li { margin-top: .75rem; }
 .menu a { color: var(--text); font-weight: 600; text-decoration: none; }
 .menu a:hover, .menu a[aria-current="page"] { text-decoration: underline; }
-.theme-toggle { width: 2.75rem; height: 2.75rem; padding: 0; font-size: 1.25rem; line-height: 1; cursor: pointer; }
+/* SVG icons, not font glyphs: glyph metrics differ per font, so text icons never sit exactly centred. */
+.theme-toggle { display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; padding: 0; cursor: pointer; }
+.theme-toggle svg { display: none; }
+.theme-toggle[data-state="auto"] .icon-auto, .theme-toggle[data-state="light"] .icon-light, .theme-toggle[data-state="dark"] .icon-dark { display: block; }
 .theme-toggle[hidden] { display: none; }
 @media (min-width: 60rem) {
   /* On wide screens the toggle sits quietly after the links; on phones it stays a pill next to Menu. */

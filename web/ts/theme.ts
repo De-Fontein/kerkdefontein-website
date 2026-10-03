@@ -5,7 +5,6 @@ type Theme = "auto" | "light" | "dark";
 const storageKey = "theme";
 const cycle: Theme[] = ["auto", "light", "dark"];
 const labels: Record<Theme, string> = { auto: "automatisch", light: "licht", dark: "donker" };
-const icons: Record<Theme, string> = { auto: "◐", light: "☀", dark: "☾" };
 
 function savedTheme(): Theme {
   try {
@@ -40,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const label = `Thema: ${labels[current]}`;
     toggle.setAttribute("aria-label", label);
     toggle.title = label;
-    toggle.querySelector("[data-theme-icon]")!.textContent = icons[current];
+    toggle.dataset.state = current; // CSS shows the matching icon
   };
   render();
   toggle.hidden = false;

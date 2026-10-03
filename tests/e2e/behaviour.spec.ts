@@ -52,3 +52,23 @@ test("unknown paths return the 404 page", async ({ page }) => {
   expect(response?.status()).toBe(404);
   await expect(page.getByRole("heading", { name: "Pagina niet gevonden" })).toBeVisible();
 });
+
+test("keyboard focus is visible on the video button and high-contrast in light mode", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.goto("/");
+  const button = page.getByRole("button", { name: /^Afspelen:/ });
+  await button.focus();
+  const ring = await button.evaluate((el) => {
+    const style = getComputedStyle(el);
+    return {
+      focusVisible: el.matches(":focus-visible"),
+      color: style.outlineColor,
+      width: parseFloat(style.outlineWidth),
+      clippedByParent: getComputedStyle(el.parentElement!).overflow !== "visible",
+    };
+  });
+  expect(ring.focusVisible).toBe(true);
+  expect(ring.width).toBeGreaterThanOrEqual(2);
+  expect(ring.clippedByParent).toBe(false); // an overflow:hidden wrapper cut the ring off entirely
+  expect(ring.color).toBe("rgb(5, 93, 117)"); // teal is 7.4:1 on white; the old sky ring was 2.6:1 (needs 3:1)
+});

@@ -21,8 +21,12 @@ func TestBudgets(t *testing.T) {
 	if len(css) > 10*1024 {
 		t.Errorf("site.css is %d bytes, budget 10 KB", len(css))
 	}
-	if len(CSSVersion) != 10 {
-		t.Errorf("CSSVersion = %q, want 10 hex chars", CSSVersion)
+	url, err := AssetURL("js/theme.js")
+	if err != nil || len(url) != len("/static/js/theme.js?v=")+10 {
+		t.Errorf("AssetURL(js/theme.js) = %q, %v", url, err)
+	}
+	if _, err := AssetURL("js/missing.js"); err == nil {
+		t.Error("unknown asset must be an error, so a template typo fails the build")
 	}
 	js, err := fs.ReadFile(Static, "static/js/youtube.js")
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/De-Fontein/kerkdefontein-website/internal/calendar"
+	"github.com/De-Fontein/kerkdefontein-website/web"
 )
 
 // Go has no locale support; these two tables are all the Dutch the date format needs.
@@ -18,6 +19,7 @@ var funcs = map[string]any{
 	"dateRange": dateRange,
 	"clock":     func(t time.Time) string { return t.In(calendar.Amsterdam).Format("15:04") },
 	"isoDate":   isoDate,
+	"asset":     web.AssetURL,
 	"limit": func(n int, events []EventView) []EventView {
 		if len(events) > n {
 			return events[:n]

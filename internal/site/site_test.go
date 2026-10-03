@@ -2,8 +2,8 @@ package site
 
 import (
 	"os"
-	"regexp"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -59,7 +59,6 @@ func TestRender_HomeShowsVideoFlyersAndThreeEvents(t *testing.T) {
 		`property="og:title"`,
 		`property="og:image" content="https://kerkdefontein.nl/static/img/share.jpg"`,
 		`"@type":"Church"`,
-		`<script type="module" src="/static/js/youtube.js"></script>`,
 		`<link rel="stylesheet" href="/static/css/site.css?v=`,
 	} {
 		if !strings.Contains(html, want) {
@@ -141,7 +140,7 @@ func TestRender_MultiDayEventsShowTheirDateRange(t *testing.T) {
 func TestRender_ThemeToggleAndBlockingScriptInHead(t *testing.T) {
 	html := render(t, sampleData(), "index.html")
 	head := html[:strings.Index(html, "</head>")]
-	if !strings.Contains(head, `<script src="/static/js/theme.js"></script>`) {
+	if !regexp.MustCompile(`<script src="/static/js/theme\.js\?v=[0-9a-f]+"></script>`).MatchString(head) {
 		t.Error("head must load theme.js as a plain blocking script")
 	}
 	if !regexp.MustCompile(`<button[^>]*\bdata-theme-toggle\b[^>]*\shidden[\s>]`).MatchString(html) {
@@ -155,5 +154,16 @@ func TestRender_MenuIsLastInHeader(t *testing.T) {
 	toggle, nav := strings.Index(html, "data-theme-toggle"), strings.Index(html, `<nav aria-label="Hoofdmenu">`)
 	if toggle < 0 || nav < 0 || toggle > nav {
 		t.Errorf("theme toggle (at %d) must come before the menu (at %d)", toggle, nav)
+	}
+}
+
+// Scripts are cached for a year like the stylesheet, so their URLs must change with their content: a stale
+// cached theme.js crashed against new markup after a deploy (2026-10-03).
+func TestRender_AssetURLsCarryAContentHash(t *testing.T) {
+	html := render(t, sampleData(), "index.html")
+	for _, asset := range []string{"/static/js/theme.js", "/static/js/youtube.js", "/static/css/site.css"} {
+		if !regexp.MustCompile(regexp.QuoteMeta(asset) + `\?v=[0-9a-f]{10}"`).MatchString(html) {
+			t.Errorf("%s is not versioned", asset)
+		}
 	}
 }

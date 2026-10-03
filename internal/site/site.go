@@ -12,7 +12,6 @@ import (
 
 	"github.com/De-Fontein/kerkdefontein-website/internal/calendar"
 	"github.com/De-Fontein/kerkdefontein-website/internal/images"
-	"github.com/De-Fontein/kerkdefontein-website/web"
 )
 
 type FlyerView struct {
@@ -78,11 +77,10 @@ var Nav = []NavItem{
 var templateFS embed.FS
 
 type view struct {
-	Page       Page
-	Data       Data
-	Nav        []NavItem
-	CSSVersion string
-	JSONLD     template.JS
+	Page   Page
+	Data   Data
+	Nav    []NavItem
+	JSONLD template.JS
 }
 
 func Render(outDir string, d Data) error {
@@ -105,7 +103,7 @@ func renderPage(outDir string, p Page, d Data) error {
 		return err
 	}
 	var buf bytes.Buffer
-	v := view{Page: p, Data: d, Nav: Nav, CSSVersion: web.CSSVersion, JSONLD: ld}
+	v := view{Page: p, Data: d, Nav: Nav, JSONLD: ld}
 	if err := tmpl.ExecuteTemplate(&buf, "layout", v); err != nil {
 		return err
 	}

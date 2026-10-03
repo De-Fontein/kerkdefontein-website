@@ -1,0 +1,16 @@
+[Unit]
+Description=Regenerate kerkdefontein.nl
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=fontein
+Group=fontein
+ExecStart=/usr/local/bin/fontein-build -config /etc/fontein/config.json
+TimeoutStartSec=55
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ReadWritePaths=/srv/site /var/cache/fontein

@@ -1,0 +1,11 @@
+{
+  "flyerFolderId": "<Drive folder id of the flyer folder>",
+  "documentsFolderId": "<Drive folder id of Documenten>",
+  "calendarId": "qqhcq4s0adfsihie9345rnrsq00gbsf4@import.calendar.google.com",
+  "calendarIcalUrl": "https://calendar.google.com/calendar/ical/qqhcq4s0adfsihie9345rnrsq00gbsf4%40import.calendar.google.com/public/basic.ics",
+  "youtubeChannelId": "UCbQP-7w5_-xFNH2x90hTxeg",
+  "credentialsFile": "/etc/fontein/service-account.json",
+  "healthcheckUrl": "https://hc-ping.com/<uuid>",
+  "siteRoot": "/srv/site",
+  "cacheDir": "/var/cache/fontein"
+}

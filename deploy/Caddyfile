@@ -1,0 +1,45 @@
+{
+	email info@kerkdefontein.nl
+}
+
+www.kerkdefontein.nl {
+	redir https://kerkdefontein.nl{uri} permanent
+}
+
+kerkdefontein.nl, nieuw.kerkdefontein.nl {
+	root * /srv/site/current
+	# The build writes .br/.gz next to text files; stock Caddy cannot make Brotli on the fly.
+	file_server {
+		precompressed br gzip
+	}
+	handle_errors {
+		rewrite * /404.html
+		file_server {
+			precompressed br gzip
+		}
+	}
+	header {
+		# Keep identical to internal/headers.CSP.
+		Content-Security-Policy "default-src 'self'; img-src 'self'; style-src 'self'; script-src 'self'; frame-src https://www.youtube-nocookie.com; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+	# Media names contain the content hash, and the stylesheet URL carries ?v=<hash>, so both never change.
+	@media path /media/*
+	header @media Cache-Control "public, max-age=31536000, immutable"
+	@busted {
+		path /static/css/*
+		query v=*
+	}
+	header @busted Cache-Control "public, max-age=31536000, immutable"
+	@static {
+		path /static/*
+		not query v=*
+	}
+	header @static Cache-Control "public, max-age=86400"
+	@pages not path /media/* /static/*
+	header @pages Cache-Control "public, max-age=60"
+}

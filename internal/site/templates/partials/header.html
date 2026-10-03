@@ -1,5 +1,6 @@
 {{define "header"}}<header class="site-header">
   <a class="brand" href="/"><img src="/static/img/logo.svg" alt="" width="36" height="36"><span>De Fontein</span></a>
+  <button type="button" class="theme-toggle" data-theme-toggle hidden aria-label="Thema: automatisch"><span aria-hidden="true" data-theme-icon>◐</span></button>
   <nav aria-label="Hoofdmenu">
     <button type="button" class="menu-toggle" popovertarget="menu">Menu</button>
     <ul id="menu" class="menu" popover>
@@ -7,5 +8,4 @@
       {{end}}
     </ul>
   </nav>
-  <button type="button" class="theme-toggle" data-theme-toggle hidden aria-label="Thema: automatisch"><span aria-hidden="true" data-theme-icon>◐</span></button>
 </header>{{end}}

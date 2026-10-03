@@ -147,3 +147,12 @@ func TestRender_ThemeToggleAndBlockingScriptInHead(t *testing.T) {
 		t.Error("theme toggle must start hidden, so it never shows without JavaScript")
 	}
 }
+
+// The menu stays in the top-right corner (user, 2026-10-03), so the theme toggle precedes it in the DOM.
+func TestRender_MenuIsLastInHeader(t *testing.T) {
+	html := render(t, sampleData(), "index.html")
+	toggle, nav := strings.Index(html, "data-theme-toggle"), strings.Index(html, `<nav aria-label="Hoofdmenu">`)
+	if toggle < 0 || nav < 0 || toggle > nav {
+		t.Errorf("theme toggle (at %d) must come before the menu (at %d)", toggle, nav)
+	}
+}

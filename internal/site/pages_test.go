@@ -95,7 +95,9 @@ func TestRender_DonerenEmbedsScipioOnClickInsteadOfMollie(t *testing.T) {
 func TestRender_NoPersonalContactDetails(t *testing.T) {
 	phone := regexp.MustCompile(`\b0\d{1,3}[- ]?\d{6,8}\b`)
 	mailto := regexp.MustCompile(`mailto:([^"]+)`)
-	allowed := map[string]bool{"info@kerkdefontein.nl": true, "verhuur@hoeksteenmiddelburg.nl": true}
+	// Role addresses reach a team, not a person; the old site lists pastoraat@ and kjp@ on Activiteiten.
+	allowed := map[string]bool{"info@kerkdefontein.nl": true, "verhuur@hoeksteenmiddelburg.nl": true,
+		"pastoraat@kerkdefontein.nl": true, "kjp@kerkdefontein.nl": true}
 	for _, p := range Pages {
 		html := render(t, sampleData(), outputPath("", p.Path))
 		if m := phone.FindString(html); m != "" {

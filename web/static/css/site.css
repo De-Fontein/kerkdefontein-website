@@ -135,3 +135,8 @@ h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0 0 1rem; }
 /* Scipio's form scrolls inside its frame; it cannot report its height to us. Its own background is light grey. */
 .giving-form iframe { display: block; width: 100%; height: min(42rem, 85svh); border: 1px solid var(--line); border-radius: var(--radius); background: #f2f3f7; }
 .giving-note { color: var(--muted); font-size: .9rem; }
+
+.toc { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; list-style: none; padding: 0; margin: 0 0 2rem; }
+blockquote { margin: 1.5rem 0; padding-left: 1.25rem; border-left: 3px solid var(--line); font-style: italic; }
+.timeline dt { font-weight: 700; margin-top: 1.25rem; }
+.timeline dd { margin: .25rem 0 0; }

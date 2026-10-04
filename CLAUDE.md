@@ -73,3 +73,5 @@ Run `make test` and `make e2e` before every commit. Both must pass.
   `expect.poll` for anything it does (such as moving focus).
 - The files in `web/ts` have no imports or exports, so `tsc` puts them in one global scope: top-level names must
   be unique across files.
+- Keep the label in the sticky "Ga naar" bar on one line. When it wrapped, WebKit on CI stopped smooth jumps
+  halfway (found with Playwright traces, 2026-10-04).

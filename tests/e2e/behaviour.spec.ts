@@ -209,6 +209,24 @@ test("on phones Ga naar opens the grouped list and jumps to the chosen activity"
   await expect(page.locator("[data-current]")).toHaveText("Pastoraat");
 });
 
+// On CI, WebKit stopped a smooth jump halfway whenever the bar's label wrapped to a second line (traces,
+// 2026-10-04); the wrapped label was also cut off at the top of the bar.
+test("the Ga naar bar keeps the current activity on one line", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  await page.goto("/activiteiten/");
+  await page.evaluate(() => document.getElementById("kjp")!.scrollIntoView({ behavior: "instant" }));
+  const label = page.locator("[data-current]");
+  await expect(label).toHaveText("Kinder- en Jeugd Pastoraat");
+  const lines = await label.evaluate((el) => {
+    const text = document.createRange();
+    text.selectNodeContents(el);
+    return new Set([...text.getClientRects()].map((r) => Math.round(r.top))).size;
+  });
+  expect(lines).toBe(1);
+  const top = await page.locator(".act-top-icon").boundingBox();
+  expect(top!.x + top!.width).toBeLessThanOrEqual(320);
+});
+
 test("Naar boven returns to the top of Activiteiten on phone and desktop", async ({ page }) => {
   for (const width of [390, 1280]) {
     await page.setViewportSize({ width, height: 800 });

@@ -192,10 +192,10 @@ h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0 0 1rem; }
 .act-nav a:hover { background: var(--surface); }
 .act-nav a[aria-current] { background: var(--surface); color: var(--accent); font-weight: 700; box-shadow: inset 3px 0 0 var(--accent); }
 .act-aside { position: sticky; top: 0; z-index: 2; }
-.act-bar { display: grid; grid-template-columns: 1fr 3rem; margin: 0 calc(-1 * var(--space)) 1rem; padding: 0 var(--space); border-bottom: 1px solid var(--line); background: var(--bg); }
+.act-bar { display: grid; grid-template-columns: minmax(0, 1fr) 3rem; margin: 0 calc(-1 * var(--space)) 1rem; padding: 0 var(--space); border-bottom: 1px solid var(--line); background: var(--bg); }
 .act-jump { display: flex; align-items: center; gap: .5rem; min-height: 3rem; padding: 0; border: 0; background: none; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
 .act-jump-label { color: var(--muted); }
-.act-current { flex: 1; font-weight: 700; }
+.act-current { flex: 1; min-width: 0; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .act-top-icon { display: flex; align-items: center; justify-content: center; width: 3rem; margin-right: -.75rem; color: var(--text); font-size: 1.25rem; font-weight: 700; text-decoration: none; }
 .act-jump-list { inset: 4rem 1rem auto 1rem; margin: 0; max-height: 75vh; overflow: auto; padding: 1.25rem 1.5rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); color: var(--text); box-shadow: 0 1rem 3rem rgb(0 0 0 / .25); }
 .act-column { display: none; }

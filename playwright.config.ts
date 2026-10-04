@@ -2,7 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "tests/e2e",
-  use: { baseURL: "http://localhost:4173" },
+  use: { baseURL: "http://localhost:4173", trace: "retain-on-failure" },
   webServer: {
     command: "go run ./cmd/fontein-preview -addr :4173 -out out/e2e",
     url: "http://localhost:4173/",

@@ -1,0 +1,22 @@
+{
+  "name": "kerkdefontein-website",
+  "version": "1.0.0",
+  "description": "Website of Baptistengemeente De Fontein, Middelburg. A Go program regenerates the static site every minute from Google Drive (flyers, ANBI documents), Google Calendar (agenda) and the YouTube channel feed.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "private": "true",
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
+    "typescript": "^7.0.2"
+  }
+}

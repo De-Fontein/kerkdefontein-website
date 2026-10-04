@@ -1,0 +1,37 @@
+{{define "layout"}}<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{.Page.Title}}</title>
+<meta name="description" content="{{.Page.Description}}">
+<meta name="color-scheme" content="light dark">
+<link rel="canonical" href="{{.Data.BaseURL}}{{.Page.Path}}">
+<link rel="icon" href="{{asset "img/logo.svg"}}" type="image/svg+xml">
+<script src="{{asset "js/theme.js"}}"></script>
+<link rel="stylesheet" href="{{asset "css/site.css"}}">
+<link rel="expect" href="#main" blocking="render">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="nl_NL">
+<meta property="og:site_name" content="Baptistengemeente De Fontein">
+<meta property="og:title" content="{{.Page.Title}}">
+<meta property="og:description" content="{{.Page.Description}}">
+<meta property="og:url" content="{{.Data.BaseURL}}{{.Page.Path}}">
+<meta property="og:image" content="{{.Data.BaseURL}}/static/img/share.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{{.JSONLD}}</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Naar de inhoud</a>
+{{template "header" .}}
+<main id="main">{{template "main" .}}</main>
+{{template "footer" .}}
+{{if eq .Page.Path "/"}}<script type="module" src="{{asset "js/youtube.js"}}"></script>
+<script type="module" src="{{asset "js/flyers.js"}}"></script>{{end}}
+{{if eq .Page.Path "/eerste-keer/"}}<script type="module" src="{{asset "js/route.js"}}"></script>{{end}}
+{{if eq .Page.Path "/activiteiten/"}}<script type="module" src="{{asset "js/activiteiten.js"}}"></script>{{end}}
+{{if eq .Page.Path "/doneren/"}}<script type="module" src="{{asset "js/giving.js"}}"></script>{{end}}
+</body>
+</html>{{end}}

@@ -1,0 +1,40 @@
+{{define "main"}}<div class="page prose">
+  <h1>Doneren</h1>
+  <section class="giving" aria-labelledby="online-titel">
+    <h2 id="online-titel">Online geven</h2>
+    <p>Geef aan de algemene middelen of aan een actueel doel, met iDEAL of een andere betaalmethode.</p>
+    <div class="giving-form">
+      <a class="button" href="https://link.socie.nl/r/sci/c/HC9DTZ7CKV" data-giving-src="https://referral.socie.nl/collections/HC9DTZ7CKV?p=false&amp;sc=sci&amp;cn=Baptistengemeente+de+Fontein%2C+Middelburg&amp;pc=3585AB&amp;l=true&amp;min=200&amp;max=50000">Geef online</a>
+    </div>
+    <p class="giving-note">Het formulier komt van Scipio en wordt pas geladen als je op de knop drukt. Scipio laadt daarbij lettertypes van Google. Lukt het niet? <a href="https://link.socie.nl/r/sci/c/HC9DTZ7CKV">Open het formulier op de website van Scipio</a>.</p>
+  </section>
+
+  <h2>Collecten</h2>
+  <p>Wekelijks kunt u uw gaven geven. Zowel voor het algemeen werk van de gemeente als een specifiek doel. U kunt geven via <a href="https://link.socie.nl/r/sci/c/HC9DTZ7CKV">iDEAL</a>. Na afloop van de samenkomst kunt u desgewenst ook contant geven. Voor collectebonnen neemt u contact op via <a href="mailto:info@kerkdefontein.nl">info@kerkdefontein.nl</a>.</p>
+
+  <h2>Giften</h2>
+  <p>Regelmatige bezoekers, betrokkenen en leden roepen wij op om Zijn werk vanuit de gemeente mogelijk te maken door een regelmatige (maandelijkse) bankoverschrijving. U kunt ook <a href="#online-titel">online geven</a>.</p>
+  <p>Giften zijn welkom op ons rekeningnummer:<br>
+  <strong>NL07RABO 0385 3320 41</strong><br>
+  t.n.v. Baptistengemeente de Fontein, Middelburg<br>
+  o.v.v. doel</p>
+
+  <h2>ANBI</h2>
+  <p>De Baptistengemeente de Fontein te Middelburg is door de belastingdienst erkend als ANBI, een Algemeen Nut Beogende Instelling. Ons RSIN fiscaal nummer is 7467990. We zijn ingeschreven bij de Kamer van Koophandel onder nummer: 50766775</p>
+  <p>Voor donateurs betekent die status dat zij giften volgens <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/aftrekposten/persoonsgebonden-aftrek/giften_aan_goede_doelen/giften">geldende regels</a> mogen aftrekken voor de inkomsten- of vennootschapsbelasting.</p>
+  <p>Organisaties die de ANBI-status hebben, voldoen aan regels die fatsoenlijk bestuur en beleid waarborgen. Deze regels zijn <a href="https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/bijzondere_regelingen/goede_doelen/algemeen_nut_beogende_instellingen/gegevens_van_een_anbi_publiceren_op_een_internetsite/">hier</a> te lezen. Onderstaande documenten geven antwoord op de gestelde regel.</p>
+  {{if .Data.Documents}}<ul class="documents">{{range .Data.Documents}}
+    <li><a href="{{.Href}}" download="{{.Title}}.pdf">{{.Title}}</a> (pdf)</li>{{end}}
+  </ul>{{else}}<p>De documenten zijn tijdelijk niet beschikbaar. Mail <a href="mailto:info@kerkdefontein.nl">info@kerkdefontein.nl</a> voor een exemplaar.</p>{{end}}
+
+  <h3>Actueel overzicht oudsten</h3>
+  <ul>
+    <li>Leander Janse (voorganger)</li>
+    <li>Paul van 't Veer (voorzitter)</li>
+    <li>Mathijs Pagé (secretaris, financien)</li>
+    <li>Mark van der Maas</li>
+    <li>Ernst Louwerse</li>
+    <li>Peter van Netten</li>
+    <li>Stéphane Albertini</li>
+  </ul>
+</div>{{end}}

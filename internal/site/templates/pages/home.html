@@ -1,0 +1,34 @@
+{{define "main"}}<section class="hero">
+  <h1>Welkom bij De Fontein</h1>
+  <p class="hero-meta">Samenkomst elke zondag om 10:00 · de Hoeksteen, Middelburg</p>
+  <p class="actions"><a class="button" href="/eerste-keer/">Eerste keer?</a> {{if .Data.Video}}<a class="button button-outline" href="#dienst">Kijk de dienst</a>{{end}}</p>
+</section>
+{{with .Data.Video}}<section id="dienst" class="section" aria-labelledby="dienst-titel">
+  <h2 id="dienst-titel">Kijk de dienst</h2>
+  <div class="video">
+    <button type="button" class="video-facade" data-youtube-id="{{.ID}}" data-youtube-title="{{.Title}}" aria-label="Afspelen: {{.Title}}">
+      {{if .Thumb.File}}<img src="/media/{{.Thumb.File}}" alt="" width="{{.Thumb.Width}}" height="{{.Thumb.Height}}" fetchpriority="high">{{end}}
+      <span class="video-play" aria-hidden="true">▶&nbsp;Afspelen</span>
+    </button>
+  </div>
+  <p class="video-title" aria-hidden="true">{{.Title}}</p>
+  <p class="video-note">De video wordt pas van YouTube geladen als je op afspelen klikt.</p>
+  <noscript><p><a href="https://www.youtube.com/watch?v={{.ID}}">Bekijk “{{.Title}}” op YouTube</a></p></noscript>
+</section>{{end}}
+<section class="section" aria-labelledby="actueel-titel">
+  <h2 id="actueel-titel">Actueel</h2>
+  {{if .Data.Flyers}}<ul class="flyers">{{range .Data.Flyers}}{{template "flyer" .}}{{end}}</ul>
+  {{else}}<p>Er zijn op dit moment geen actuele berichten.</p>{{end}}
+</section>
+<div class="section split">
+  <section aria-labelledby="agenda-titel">
+    <h2 id="agenda-titel">Agenda</h2>
+    {{template "events" (limit 3 .Data.Events)}}
+    <p><a href="/agenda/">Volledige agenda</a></p>
+  </section>
+  <section class="give" aria-labelledby="geven-titel">
+    <h2 id="geven-titel">Doneren</h2>
+    <p>Steun het werk van de gemeente.</p>
+    <p><a class="button" href="/doneren/">Doneren</a></p>
+  </section>
+</div>{{end}}

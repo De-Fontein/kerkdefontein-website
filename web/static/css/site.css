@@ -1,0 +1,223 @@
+:root {
+  color-scheme: light dark;
+  --font: system-ui, -apple-system, "Segoe UI Variable", "Segoe UI", Roboto, "Noto Sans", Ubuntu, Cantarell, sans-serif;
+  --navy: #081f37; --teal: #055d75; --sky: #33b1c8; --sand: #e0d3bb; --cream: #fff4e7;
+  --bg: #fff; --text: var(--navy); --muted: #3d5468; --accent: var(--teal); --on-accent: #fff;
+  --line: var(--sand); --surface: #faf6ef;
+  /* The end stop is a lighter tint of #a4cfd7: teal text on #a4cfd7 is 4.4:1, below AA. */
+  --hero: linear-gradient(135deg, var(--cream) 0%, var(--sand) 45%, #c4e1e7 100%);
+  --hero-text: var(--navy); --hero-meta: var(--teal);
+  /* Sky is decoration only: 2.6:1 on white is below the 3:1 a focus ring needs. */
+  --focus: var(--teal);
+  --radius: 1rem; --space: clamp(1rem, 4vw, 2rem); --max: 72rem;
+}
+/* Dark tokens appear twice: CSS cannot share one block between a media query and an attribute selector. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f0f10; --text: var(--cream); --muted: var(--sand); --accent: var(--cream); --on-accent: var(--navy);
+    --line: #2a2a2e; --surface: #18181b;
+    --hero: radial-gradient(ellipse at 80% 20%, var(--teal) 0%, var(--navy) 50%, #0f0f10 100%);
+    --hero-text: var(--cream); --hero-meta: var(--sand);
+    --focus: var(--sky);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0f0f10; --text: var(--cream); --muted: var(--sand); --accent: var(--cream); --on-accent: var(--navy);
+  --line: #2a2a2e; --surface: #18181b;
+  --hero: radial-gradient(ellipse at 80% 20%, var(--teal) 0%, var(--navy) 50%, #0f0f10 100%);
+  --hero-text: var(--cream); --hero-meta: var(--sand);
+  --focus: var(--sky);
+}
+:root[data-theme="light"] { color-scheme: light; }
+/* OLED: true black, so those pixels switch off; only chosen explicitly, never by "auto". */
+:root[data-theme="oled"] {
+  color-scheme: dark;
+  --bg: #000; --text: var(--cream); --muted: var(--sand); --accent: var(--cream); --on-accent: var(--navy);
+  --line: #26262a; --surface: #000;
+  --hero: radial-gradient(ellipse at 80% 20%, #033847 0%, #000 60%);
+  --hero-text: var(--cream); --hero-meta: var(--sand);
+  --focus: var(--sky);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 1.0625rem/1.6 var(--font); }
+img { max-width: 100%; height: auto; display: block; }
+a { color: var(--accent); text-underline-offset: .15em; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: .25rem; }
+h1, h2, h3 { line-height: 1.1; letter-spacing: -.01em; text-wrap: balance; }
+h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0 0 1rem; }
+.skip-link { position: absolute; left: 1rem; top: -4rem; z-index: 10; background: var(--bg); padding: .5rem 1rem; }
+.skip-link:focus { top: 1rem; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* Fixed slots: a slow connection paints the header before all of it has arrived, and an item that turns up
+   later must not push one already drawn. Menu's slot is wider than the button needs, in any system font. */
+.site-header { display: grid; grid-template-columns: 1fr minmax(5.5rem, auto); grid-template-areas: "brand nav"; grid-template-rows: 2.75rem; align-items: center; gap: .75rem; max-width: var(--max); margin: 0 auto; padding: 1rem var(--space); }
+:root[data-js] .site-header { grid-template-columns: 1fr 2.75rem minmax(5.5rem, auto); grid-template-areas: "brand toggle nav"; }
+.site-header nav { grid-area: nav; justify-self: end; }
+.theme-toggle { grid-area: toggle; }
+/* Too narrow for the name beside the buttons (small phones, zoomed-in Safari): the logo alone, name for screen readers. */
+@media (max-width: 22.49rem) { .brand span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; } }
+.brand { grid-area: brand; justify-self: start; display: flex; align-items: center; gap: .5rem; font-weight: 700; color: var(--text); text-decoration: none; }
+/* Fixed width: the button keeps its place even if it is drawn before its label has arrived. */
+.menu-toggle { width: 5.5rem; }
+.menu-toggle, .theme-toggle { font: inherit; font-weight: 600; color: var(--text); background: none; border: 2px solid currentColor; border-radius: 99px; padding: .4rem 1rem; }
+.menu { list-style: none; margin: 0; padding: 1.5rem; border: 0; border-radius: var(--radius); background: var(--bg); color: var(--text); box-shadow: 0 1rem 3rem rgb(0 0 0 / .25); inset: 4.5rem 1rem auto auto; }
+.menu li + li { margin-top: .75rem; }
+.menu a { color: var(--text); font-weight: 600; text-decoration: none; }
+.menu a:hover, .menu a[aria-current] { text-decoration: underline; }
+/* SVG icons, not font glyphs: glyph metrics differ per font, so text icons never sit exactly centred. */
+/* Hidden without JS (it could not apply a theme). The icon follows the root theme, set before first paint. */
+.theme-toggle { display: none; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; padding: 0; cursor: pointer; }
+:root[data-js] .theme-toggle { display: inline-flex; }
+.theme-toggle svg { display: none; }
+:root:not([data-theme]) .icon-auto, :root[data-theme="light"] .icon-light,
+:root[data-theme="dark"] .icon-dark, :root[data-theme="oled"] .icon-oled { display: block; }
+/* Not display:none: masks inside an undisplayed SVG do not render in every browser. */
+.svg-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+.theme-menu { position: fixed; inset: auto; margin: 0; padding: .75rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); color: var(--text); box-shadow: 0 1rem 3rem rgb(0 0 0 / .25); }
+.theme-menu fieldset { border: 0; margin: 0; padding: 0; }
+.theme-menu legend { font-weight: 700; padding: 0 .5rem .5rem; }
+.theme-menu label { display: flex; align-items: center; gap: .75rem; padding: .5rem; border-radius: .5rem; cursor: pointer; }
+.theme-menu label:hover, .theme-menu label:has(:checked) { background: var(--surface); }
+.theme-menu label:has(:checked) { font-weight: 700; }
+.theme-menu input { accent-color: var(--teal); margin: 0; }
+@media (min-width: 60rem) {
+  /* On wide screens the toggle sits quietly after the links; on phones it stays a pill next to Menu. */
+  .site-header { grid-template-columns: 1fr auto; }
+  :root[data-js] .site-header { grid-template-columns: 1fr auto 2.75rem; grid-template-areas: "brand nav toggle"; }
+  .theme-toggle { border-color: transparent; }
+  .theme-toggle:hover { border-color: var(--line); }
+  .menu-toggle { display: none; }
+  .menu[popover] { display: flex; position: static; inset: auto; gap: 1.5rem; align-items: center; padding: 0; overflow: visible; background: none; box-shadow: none; }
+  .menu li + li { margin-top: 0; }
+}
+
+.hero { background: var(--hero); color: var(--hero-text); text-align: center; padding: clamp(3rem, 10vw, 7rem) var(--space); }
+.hero h1 { font-size: clamp(2.5rem, 8vw, 5rem); font-weight: 800; margin: 0 auto; max-width: 14ch; }
+.hero-meta { color: var(--hero-meta); font-weight: 600; margin: 1rem 0 2rem; }
+/* A slot per button: centring the pair as a group would move the first one when the second arrives. */
+/* Fixed, equal slots: a button never resizes or moves while its label or its neighbour is still arriving.
+   12rem fits "Kijk de dienst" in every system font; stacked on screens too narrow for two. */
+.actions { display: grid; grid-template-columns: min(100%, 12rem); justify-content: center; gap: .75rem; margin: 0; }
+.actions .button { text-align: center; }
+@media (min-width: 28rem) { .actions { grid-template-columns: repeat(2, 12rem); } }
+
+.button { display: inline-block; font: inherit; font-weight: 700; padding: .75rem 1.5rem; border-radius: 99px; border: 2px solid var(--accent); background: var(--accent); color: var(--on-accent); text-decoration: none; cursor: pointer; }
+.button-outline { background: transparent; color: var(--accent); }
+
+.section, .page { max-width: var(--max); margin: 0 auto; padding: var(--space); }
+.page h1 { font-size: clamp(2rem, 6vw, 3.5rem); font-weight: 800; margin: 1rem 0; }
+.prose { max-width: 65ch; }
+.split { display: grid; gap: var(--space); }
+@media (min-width: 48rem) { .split { grid-template-columns: 2fr 1fr; align-items: start; } }
+
+/* No overflow:hidden on .video: it would clip the play button's focus ring; children round their own corners. */
+.video { aspect-ratio: 16 / 9; border-radius: var(--radius); background: #000; }
+.video-facade { position: relative; width: 100%; height: 100%; padding: 0; border: 0; border-radius: var(--radius); overflow: hidden; background: #000; color: #fff; font: inherit; cursor: pointer; }
+.video-facade img { width: 100%; height: 100%; object-fit: cover; }
+/* Anchored at the top: a long title wraps downwards, so the label never moves as its text arrives. */
+.video-play { position: absolute; inset: .75rem auto auto .75rem; padding: .4rem .85rem; border-radius: 99px; background: rgb(0 0 0 / .75); text-align: left; font-weight: 700; }
+.video iframe { width: 100%; height: 100%; border: 0; border-radius: var(--radius); }
+/* Duplicate of the button's name for sighted users, so hidden from screen readers. */
+.video-title { font-weight: 700; margin: .75rem 0 0; }
+.video-note { color: var(--muted); font-size: .9rem; }
+
+.flyers { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 48rem) { .flyers { grid-template-columns: repeat(3, 1fr); } }
+.flyer-open { display: block; width: 100%; padding: 0; border: 0; border-radius: .75rem; overflow: hidden; background: none; cursor: zoom-in; }
+/* Enlarged flyer: fits the screen with its controls around it, so the whole flyer shows at once. Every size comes
+   from the screen, never the image, so nothing moves while an image loads or between flyers (other shapes are
+   letterboxed). Portrait screens: controls above and below; wide screens: beside the flyer at full height. The
+   control rows have a fixed height, so a flyer with or without "Meer info" keeps the buttons in place. */
+.flyer-popover { inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 1rem; border: 0; background: #0a0a0c; color: #fff; --focus: var(--sky); }
+.flyer-popover:popover-open { display: grid; gap: .75rem; align-items: center; grid-template-columns: auto 1fr auto; grid-template-rows: 3.5rem minmax(0, 1fr) 3.5rem; grid-template-areas: "count . close" "image image image" "prev info next"; }
+.flyer-popover::backdrop { background: #0a0a0c; }
+.flyer-zoom { grid-area: image; display: block; width: 100%; height: 100%; cursor: zoom-in; }
+.flyer-zoom img { width: 100%; height: 100%; object-fit: contain; }
+.flyer-count { grid-area: count; font-weight: 600; font-variant-numeric: tabular-nums; }
+.flyer-popover [data-flyer-prev] { grid-area: prev; }
+.flyer-popover [data-flyer-next] { grid-area: next; }
+.flyer-close { grid-area: close; }
+.flyer-info { grid-area: info; justify-self: center; background: #fff; border-color: #fff; color: var(--navy); }
+.flyer-step { display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; padding: 0; border: 2px solid #fff; border-radius: 99px; background: rgb(0 0 0 / .4); color: #fff; cursor: pointer; }
+.flyer-step:hover { background: rgb(255 255 255 / .15); }
+@media (min-aspect-ratio: 1/1) {
+  .flyer-popover:popover-open { column-gap: 1.5rem; grid-template-columns: 1fr min(calc((100svh - 2rem) / 1.4142), calc(100vw - 14rem)) 1fr; grid-template-rows: 3.5rem 1fr 3.5rem; grid-template-areas: "count image close" "prev image next" ". image info"; }
+  .flyer-count, .flyer-popover [data-flyer-prev] { justify-self: end; }
+  .flyer-close, .flyer-popover [data-flyer-next], .flyer-info { justify-self: start; }
+  .flyer-count, .flyer-close { align-self: start; }
+  .flyer-info { align-self: end; }
+}
+/* Zoomed (a click on the flyer): wide and scrollable, with the controls above and below as on phones. */
+.flyer-popover.zoomed { grid-template-columns: auto 1fr auto; grid-template-rows: 3.5rem minmax(0, 1fr) 3.5rem; grid-template-areas: "count . close" "image image image" "prev info next"; }
+.flyer-popover.zoomed .flyer-info { justify-self: center; align-self: center; }
+.flyer-popover.zoomed .flyer-zoom { overflow: auto; cursor: zoom-out; }
+.flyer-popover.zoomed .flyer-zoom img { width: clamp(50rem, 100%, 60rem); max-width: none; height: auto; margin: 0 auto; }
+
+.events { list-style: none; margin: 0; padding: 0; }
+.event { display: grid; grid-template-columns: 6.5rem 1fr; gap: .25rem 1rem; padding: .75rem 0; border-bottom: 1px solid var(--line); }
+.event time { font-weight: 700; grid-row: span 3; }
+.event-meta { color: var(--muted); }
+.event-ics { font-size: .9rem; }
+.give { background: var(--teal); color: #fff; border-radius: var(--radius); padding: var(--space); }
+.give .button { background: #fff; color: var(--navy); border-color: #fff; }
+
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: .25rem 1rem; }
+.facts dt { font-weight: 700; }
+.facts dd { margin: 0; }
+.documents { padding-left: 1.25rem; }
+
+/* Full-width background, content aligned with the --max column above it. */
+.site-footer { margin-top: 3rem; border-top: 1px solid var(--line); background: var(--surface); padding: var(--space) max(var(--space), calc((100% - var(--max)) / 2 + var(--space))); display: grid; gap: 1.5rem; }
+@media (min-width: 48rem) { .site-footer { grid-template-columns: 1fr 1fr; } }
+.site-footer address { font-style: normal; }
+.site-footer ul { list-style: none; margin: 0; padding: 0; }
+
+/* Scipio's form scrolls inside its frame; it cannot report its height to us. Its own background is light grey. */
+.giving-form iframe { display: block; width: 100%; height: min(42rem, 85svh); border: 1px solid var(--line); border-radius: var(--radius); background: #f2f3f7; }
+.giving-note { color: var(--muted); font-size: .9rem; }
+
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+/* Activiteiten: one flat article (Safari Reader shows only one block otherwise) beside a grouped list that
+   follows along; on phones the list opens from a bar that stays at the top. */
+.act-nav, .act-nav ul { list-style: none; margin: 0; padding: 0; }
+.act-nav > li + li { margin-top: 1rem; }
+.nav-group-title, .act-group, .act-facts dt { font-size: .8rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.nav-group-title { display: block; margin-bottom: .25rem; }
+.act-nav a { display: block; padding: .35rem .75rem; margin-left: -.75rem; border-radius: .5rem; color: var(--text); text-decoration: none; }
+.act-nav a:hover { background: var(--surface); }
+.act-nav a[aria-current] { background: var(--surface); color: var(--accent); font-weight: 700; box-shadow: inset 3px 0 0 var(--accent); }
+.act-aside { position: sticky; top: 0; z-index: 2; }
+.act-bar { display: grid; grid-template-columns: minmax(0, 1fr) 3rem; margin: 0 calc(-1 * var(--space)) 1rem; padding: 0 var(--space); border-bottom: 1px solid var(--line); background: var(--bg); }
+.act-jump { display: flex; align-items: center; gap: .5rem; min-height: 3rem; padding: 0; border: 0; background: none; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+.act-jump-label { color: var(--muted); }
+.act-current { flex: 1; min-width: 0; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.act-top-icon { display: flex; align-items: center; justify-content: center; width: 3rem; margin-right: -.75rem; color: var(--text); font-size: 1.25rem; font-weight: 700; text-decoration: none; }
+.act-jump-list { inset: 4rem 1rem auto 1rem; margin: 0; max-height: 75vh; overflow: auto; padding: 1.25rem 1.5rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); color: var(--text); box-shadow: 0 1rem 3rem rgb(0 0 0 / .25); }
+.act-column { display: none; }
+.act-column-title { font-weight: 700; margin: 0 0 .75rem; }
+.act-top { margin: 1.5rem 0 0; padding-top: 1rem; border-top: 1px solid var(--line); }
+.act-top a { color: var(--accent); font-weight: 700; text-decoration: none; }
+.act-group { margin: 2.5rem 0 .25rem; padding-top: 2rem; border-top: 1px solid var(--line); }
+.act-group:first-child { margin-top: 0; padding-top: .5rem; border-top: 0; }
+.act-article h2 { margin: 0 0 1rem; scroll-margin-top: 4.5rem; }
+.act-facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: .75rem 1.5rem; margin: 0 0 1.5rem; padding: 1rem 1.25rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.act-facts dd { margin: .15rem 0 0; font-weight: 600; }
+/* Heading and text sit in the same centred column as every text page; the list goes in the margin beside it
+   once the margin is wide enough (78rem), and until then the phone's "Ga naar" bar is used. */
+.act-page { max-width: 65ch; }
+@media (min-width: 78rem) {
+  .act-page { max-width: none; display: grid; grid-template-columns: 1fr minmax(0, 65ch) 1fr; align-items: start; }
+  .act-page > h1, .act-article { grid-column: 2; margin-inline: var(--space); }
+  .act-aside { grid-column: 1; grid-row: 2; justify-self: end; width: 15rem; margin-right: 1rem; top: 1.5rem; }
+  .act-bar, .act-jump-list { display: none; }
+  .act-column { display: block; }
+  .act-article h2 { scroll-margin-top: 1.5rem; }
+}
+blockquote { margin: 1.5rem 0; padding-left: 1.25rem; border-left: 3px solid var(--line); font-style: italic; }
+.timeline dt { font-weight: 700; margin-top: 1.25rem; }
+.timeline dd { margin: .25rem 0 0; }

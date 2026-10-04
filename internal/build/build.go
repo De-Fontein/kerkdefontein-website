@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/De-Fontein/kerkdefontein-website/internal/calendar"
@@ -63,7 +64,9 @@ func Run(ctx context.Context, log *slog.Logger, src Sources, s Settings, now tim
 		log.Error("source failed, keeping current release", "err", err)
 		return Outcome{}, err
 	}
-	fp := Fingerprint(s.Version+"+"+embeddedContent(), in.flyers, in.docs, in.events, in.video)
+	// The settings that end up in the pages count as code: changing them must republish.
+	code := strings.Join([]string{s.Version, embeddedContent(), s.BaseURL, s.CalendarICalURL}, "+")
+	fp := Fingerprint(code, in.flyers, in.docs, in.events, in.video)
 	if previous, err := os.ReadFile(filepath.Join(s.SiteRoot, fingerprintTxt)); err == nil && string(previous) == fp {
 		log.Info("no change", "fingerprint", fp[:12])
 		return Outcome{}, nil

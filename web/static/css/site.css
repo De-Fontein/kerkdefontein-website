@@ -67,7 +67,7 @@ h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0 0 1rem; }
 .menu { list-style: none; margin: 0; padding: 1.5rem; border: 0; border-radius: var(--radius); background: var(--bg); color: var(--text); box-shadow: 0 1rem 3rem rgb(0 0 0 / .25); inset: 4.5rem 1rem auto auto; }
 .menu li + li { margin-top: .75rem; }
 .menu a { color: var(--text); font-weight: 600; text-decoration: none; }
-.menu a:hover, .menu a[aria-current="page"] { text-decoration: underline; }
+.menu a:hover, .menu a[aria-current] { text-decoration: underline; }
 /* SVG icons, not font glyphs: glyph metrics differ per font, so text icons never sit exactly centred. */
 /* Hidden without JS (it could not apply a theme). The icon follows the root theme, set before first paint. */
 .theme-toggle { display: none; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; padding: 0; cursor: pointer; }

@@ -240,3 +240,34 @@ func TestRender_EnlargedFlyersLinkToTheirNeighbours(t *testing.T) {
 		t.Error("a single flyer needs no gallery navigation")
 	}
 }
+
+func TestRender_MenuMarksTheSectionOfASubpage(t *testing.T) {
+	html := render(t, sampleData(), "over-ons/israel/index.html")
+	if !strings.Contains(html, `<a href="/over-ons/" aria-current="true">Over ons</a>`) {
+		t.Error("Over ons is not marked as the current section on its subpage")
+	}
+	if strings.Contains(render(t, sampleData(), "over-ons/index.html"), `aria-current="true"`) {
+		t.Error("Over ons itself should be the current page, not the current section")
+	}
+}
+
+func TestRender_SitemapListsEveryPageButNotFound(t *testing.T) {
+	xml := render(t, sampleData(), "sitemap.xml")
+	for _, p := range Pages {
+		loc := "<loc>https://kerkdefontein.nl" + p.Path + "</loc>"
+		if p.Path == "/404" {
+			if strings.Contains(xml, loc) {
+				t.Errorf("sitemap lists the 404 page")
+			}
+		} else if !strings.Contains(xml, loc) {
+			t.Errorf("sitemap misses %s", p.Path)
+		}
+	}
+}
+
+func TestRender_RobotsPointsToTheSitemap(t *testing.T) {
+	robots := render(t, sampleData(), "robots.txt")
+	if !strings.Contains(robots, "Sitemap: https://kerkdefontein.nl/sitemap.xml") {
+		t.Errorf("robots.txt = %q", robots)
+	}
+}

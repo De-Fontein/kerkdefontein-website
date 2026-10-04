@@ -25,7 +25,7 @@
   <nav aria-label="Hoofdmenu">
     <button type="button" class="menu-toggle" popovertarget="menu">Menu</button>
     <ul id="menu" class="menu" popover>
-      {{range .Nav}}<li><a href="{{.Path}}"{{if eq .Path $.Page.Path}} aria-current="page"{{end}}>{{.Label}}</a></li>
+      {{range .Nav}}<li><a href="{{.Path}}"{{if eq .Path $.Page.Path}} aria-current="page"{{else if hasPrefix $.Page.Path .Path}} aria-current="true"{{end}}>{{.Label}}</a></li>
       {{end}}
     </ul>
   </nav>

@@ -285,3 +285,16 @@ func TestRun_ChangedTemplatesRepublishUnderTheSameVersion(t *testing.T) {
 		t.Fatalf("changed templates must republish: published=%v err=%v", out.Published, err)
 	}
 }
+
+// Moving from the temporary link to nieuw.kerkdefontein.nl changes only the config; the pages must follow.
+func TestRun_ChangedBaseURLRepublishes(t *testing.T) {
+	src, s := setup(t, nil)
+	if _, err := Run(context.Background(), quiet, src, s, now); err != nil {
+		t.Fatal(err)
+	}
+	s.BaseURL = "https://nieuw.kerkdefontein.nl"
+	out, err := Run(context.Background(), quiet, src, s, now.Add(time.Minute))
+	if err != nil || !out.Published {
+		t.Fatalf("a new base URL must republish: published=%v err=%v", out.Published, err)
+	}
+}

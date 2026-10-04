@@ -95,6 +95,7 @@ The site and email move separately. Moving the domain and the 50 mailboxes (abou
 - **Language:** Dutch only for now. Visitors from Ukraine, Germany, Russia and elsewhere make translations a
   future option.
 - **Every page** carries Open Graph tags and schema.org JSON-LD (`Church`, plus `Event` on the agenda).
+- `sitemap.xml` lists every page, and `robots.txt` points to it.
 - **Themes:** a dropdown with the options Automatisch, Licht, Donker and OLED (true black). The menu stays top
   right. On desktop the theme button is a borderless icon after the links. The choice is stored in
   `localStorage` and applied before the first paint.
@@ -137,6 +138,8 @@ The site and email move separately. Moving the domain and the 50 mailboxes (abou
 | 2026-10-04 | The enlarged view keeps keyboard focus inside and returns it on close (WCAG 2.2 Focus Not Obscured) |
 | 2026-10-04 | Below 360 px the header shows only the logo; the video title sits below its thumbnail |
 | 2026-10-04 | Text pages, Agenda and Activiteiten share one centred reading column; Activiteiten's list sits in the margin |
+| 2026-10-04 | Add `sitemap.xml` and `robots.txt`. No "this Sunday" block (the agenda covers it), no flyer end dates (too error-prone), no video archive (YouTube playlists do it) |
+| 2026-10-04 | The volunteer guide lives in the parent Drive folder, not on the site |
 
 ## Open items
 

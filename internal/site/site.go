@@ -101,7 +101,7 @@ func Render(outDir string, d Data) error {
 			return fmt.Errorf("render %s: %w", p.Path, err)
 		}
 	}
-	return nil
+	return writeCrawlerFiles(outDir, d.BaseURL)
 }
 
 func renderPage(outDir string, p Page, d Data) error {

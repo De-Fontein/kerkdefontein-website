@@ -2,6 +2,7 @@ package site
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/De-Fontein/kerkdefontein-website/internal/calendar"
@@ -20,6 +21,7 @@ var funcs = map[string]any{
 	"clock":     func(t time.Time) string { return t.In(calendar.Amsterdam).Format("15:04") },
 	"isoDate":   isoDate,
 	"asset":     web.AssetURL,
+	"hasPrefix": strings.HasPrefix,
 	"limit": func(n int, events []EventView) []EventView {
 		if len(events) > n {
 			return events[:n]

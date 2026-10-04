@@ -61,8 +61,8 @@ Run `make test` and `make e2e` before every commit. Both must pass.
 
 ## Gotchas
 
-- The build fingerprint covers the sources, the binary version and the embedded templates and assets, but **not
-  the config**. After changing `config.json`, delete `<siteRoot>/fingerprint` to force a rebuild.
+- The build fingerprint covers the sources, the binary version, the embedded templates and assets, and the
+  settings that end up in the pages (`baseUrl`, `calendarIcalUrl`). Other config changes need no rebuild.
 - Release names are UTC seconds. Two builds in the same second fail on purpose, so use a later `now` in tests.
 - The Playwright `webServer` runs the preview with fake data. Tests that touch YouTube or Scipio must stub them
   with `page.route`.
